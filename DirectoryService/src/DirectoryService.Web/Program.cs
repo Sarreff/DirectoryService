@@ -1,16 +1,34 @@
-var builder = WebApplication.CreateBuilder(args);
+using System.Globalization;
+using DirectoryService.Infrastructure.Postgres.Configurations;
+using DirectoryService.Web.Configurations;
+using Serilog;
 
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
+    .CreateBootstrapLogger();
 
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
+try
 {
-    app.MapOpenApi();
-    app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "DirectoryService"));
+    Log.Information("Starting web application...");
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Services
+        .AddConfiguration(builder.Configuration)
+        .AddInfrastructureConfiguration(builder.Configuration);
+
+    var app = builder.Build();
+
+    app.Configure();
+
+    app.Run();
 }
-
-app.MapControllers();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
