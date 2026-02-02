@@ -5,8 +5,6 @@ namespace DirectoryService.Domain.Positions;
 
 public record Description
 {
-    private const int MAX_LENGTH = 1000;
-
     public string? Value { get; }
 
     private Description(string? value)
@@ -28,7 +26,7 @@ public record Description
             return GeneralErrors.ValueIsInvalid("Description");
         }
 
-        if (normalizedDescription.Length > MAX_LENGTH)
+        if (normalizedDescription.Length > LengthConstants.LENGTH1000)
         {
             return Error.Validation(
                 "description.value.length",
