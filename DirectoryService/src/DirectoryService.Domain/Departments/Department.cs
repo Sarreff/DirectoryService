@@ -1,5 +1,8 @@
-﻿using DirectoryService.Domain.Locations;
+﻿using DirectoryService.Domain.Departments.ValueObjects;
+using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Positions;
+using Name = DirectoryService.Domain.Departments.ValueObjects.Name;
+using Path = DirectoryService.Domain.Departments.ValueObjects.Path;
 
 namespace DirectoryService.Domain.Departments;
 
@@ -9,10 +12,10 @@ public sealed class Department
     private readonly List<DepartmentPosition> _departmentPositions = [];
 
     public Department(
-        Guid id,
+        DepartmentId id,
         Name name,
         Identifier identifier,
-        Guid? parentId,
+        DepartmentId? parentId,
         Path path,
         short depth,
         bool isActive)
@@ -31,13 +34,13 @@ public sealed class Department
     // EF Core
     private Department() { }
 
-    public Guid Id { get; }
+    public DepartmentId Id { get; }
 
     public Name Name { get; private set; }
 
     public Identifier Identifier { get; private set; }
 
-    public Guid? ParentId { get; private set; }
+    public DepartmentId? ParentId { get; private set; }
 
     public Path Path { get; private set; }
 
@@ -55,15 +58,13 @@ public sealed class Department
 
     public void AddLocation(Location location)
     {
-        var id = Guid.NewGuid();
-        var newDepartmentLocation = new DepartmentLocation(id, this, location);
+        var newDepartmentLocation = new DepartmentLocation(new DepartmentLocationId(Guid.NewGuid()), Id, location.Id);
         _departmentLocations.Add(newDepartmentLocation);
     }
 
     public void AddPosition(Position position)
     {
-        var id = Guid.NewGuid();
-        var newDepartmentPosition = new DepartmentPosition(id, this, position);
+        var newDepartmentPosition = new DepartmentPosition(new DepartmentPositionId(Guid.NewGuid()), Id, position.Id);
         _departmentPositions.Add(newDepartmentPosition);
     }
 }

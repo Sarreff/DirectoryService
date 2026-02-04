@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Shared;
 
-namespace DirectoryService.Domain.Departments;
+namespace DirectoryService.Domain.Positions.ValueObjects;
 
 public record Name
 {
@@ -21,11 +21,11 @@ public record Name
             return GeneralErrors.ValueIsInvalid("Name");
         }
 
-        if (normalizedName.Length is < LengthConstants.LENGTH3 or > LengthConstants.LENGTH150)
+        if (normalizedName.Length is < LengthConstants.LENGTH3 or > LengthConstants.LENGTH100)
         {
             return Error.Validation(
                 "name.value.length",
-                "Department name must be between 3 and 150 characters long.",
+                "Position name must be between 3 and 100 characters long.",
                 "name.value");
         }
 

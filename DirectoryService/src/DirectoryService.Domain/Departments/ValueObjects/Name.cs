@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Shared;
 
-namespace DirectoryService.Domain.Locations;
+namespace DirectoryService.Domain.Departments.ValueObjects;
 
 public record Name
 {
@@ -25,7 +25,7 @@ public record Name
         {
             return Error.Validation(
                 "name.value.length",
-                "Location name must be between 3 and 120 characters long.",
+                "Department name must be between 3 and 150 characters long.",
                 "name.value");
         }
 

@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Shared;
 
-namespace DirectoryService.Domain.Positions;
+namespace DirectoryService.Domain.Locations.ValueObjects;
 
 public record Name
 {
@@ -21,11 +21,11 @@ public record Name
             return GeneralErrors.ValueIsInvalid("Name");
         }
 
-        if (normalizedName.Length is < LengthConstants.LENGTH3 or > LengthConstants.LENGTH100)
+        if (normalizedName.Length is < LengthConstants.LENGTH3 or > LengthConstants.LENGTH150)
         {
             return Error.Validation(
                 "name.value.length",
-                "Position name must be between 3 and 100 characters long.",
+                "Location name must be between 3 and 120 characters long.",
                 "name.value");
         }
 

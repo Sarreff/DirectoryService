@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryService.Infrastructure.Postgres.Migrations
 {
     [DbContext(typeof(DirectoryServiceDbContext))]
-    [Migration("20260202184645_Initial")]
+    [Migration("20260204135143_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -76,10 +76,9 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                     b.HasKey("Id")
                         .HasName("pk_department_locations");
 
-                    b.HasIndex("LocationId");
+                    b.HasIndex("DepartmentId");
 
-                    b.HasIndex("DepartmentId", "LocationId")
-                        .IsUnique();
+                    b.HasIndex("LocationId");
 
                     b.ToTable("department_locations", (string)null);
                 });
@@ -101,10 +100,9 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                     b.HasKey("Id")
                         .HasName("pk_department_positions");
 
-                    b.HasIndex("PositionId");
+                    b.HasIndex("DepartmentId");
 
-                    b.HasIndex("DepartmentId", "PositionId")
-                        .IsUnique();
+                    b.HasIndex("PositionId");
 
                     b.ToTable("department_positions", (string)null);
                 });
@@ -164,7 +162,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.OwnsOne("DirectoryService.Domain.Departments.Identifier", "Identifier", b1 =>
+                    b.OwnsOne("DirectoryService.Domain.Departments.ValueObjects.Identifier", "Identifier", b1 =>
                         {
                             b1.Property<Guid>("DepartmentId")
                                 .HasColumnType("uuid");
@@ -183,7 +181,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                                 .HasForeignKey("DepartmentId");
                         });
 
-                    b.OwnsOne("DirectoryService.Domain.Departments.Name", "Name", b1 =>
+                    b.OwnsOne("DirectoryService.Domain.Departments.ValueObjects.Name", "Name", b1 =>
                         {
                             b1.Property<Guid>("DepartmentId")
                                 .HasColumnType("uuid");
@@ -202,7 +200,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                                 .HasForeignKey("DepartmentId");
                         });
 
-                    b.OwnsOne("DirectoryService.Domain.Departments.Path", "Path", b1 =>
+                    b.OwnsOne("DirectoryService.Domain.Departments.ValueObjects.Path", "Path", b1 =>
                         {
                             b1.Property<Guid>("DepartmentId")
                                 .HasColumnType("uuid");
@@ -232,63 +230,66 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
             modelBuilder.Entity("DirectoryService.Domain.Departments.DepartmentLocation", b =>
                 {
-                    b.HasOne("DirectoryService.Domain.Departments.Department", "Department")
+                    b.HasOne("DirectoryService.Domain.Departments.Department", null)
                         .WithMany("DepartmentLocations")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("DirectoryService.Domain.Locations.Location", "Location")
+                    b.HasOne("DirectoryService.Domain.Locations.Location", null)
                         .WithMany("DepartmentLocations")
                         .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Department");
-
-                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Departments.DepartmentPosition", b =>
                 {
-                    b.HasOne("DirectoryService.Domain.Departments.Department", "Department")
+                    b.HasOne("DirectoryService.Domain.Departments.Department", null)
                         .WithMany("DepartmentPositions")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("DirectoryService.Domain.Positions.Position", "Position")
+                    b.HasOne("DirectoryService.Domain.Positions.Position", null)
                         .WithMany("DepartmentPositions")
                         .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Department");
-
-                    b.Navigation("Position");
                 });
 
             modelBuilder.Entity("DirectoryService.Domain.Locations.Location", b =>
                 {
-                    b.OwnsOne("DirectoryService.Domain.Locations.Address", "Address", b1 =>
+                    b.OwnsOne("DirectoryService.Domain.Locations.ValueObjects.Address", "Address", b1 =>
                         {
-                            b1.Property<Guid>("LocationId")
-                                .HasColumnType("uuid");
+                            b1.Property<Guid>("LocationId");
 
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("address");
+                            b1.Property<int>("Building");
+
+                            b1.Property<string>("City")
+                                .IsRequired();
+
+                            b1.Property<string>("Country")
+                                .IsRequired();
+
+                            b1.Property<int>("OfficeNumber");
+
+                            b1.Property<string>("Street")
+                                .IsRequired();
 
                             b1.HasKey("LocationId");
 
                             b1.ToTable("locations");
 
+                            b1
+                                .ToJson("address")
+                                .HasColumnType("jsonb");
+
                             b1.WithOwner()
                                 .HasForeignKey("LocationId");
                         });
 
-                    b.OwnsOne("DirectoryService.Domain.Locations.Name", "Name", b1 =>
+                    b.OwnsOne("DirectoryService.Domain.Locations.ValueObjects.Name", "Name", b1 =>
                         {
                             b1.Property<Guid>("LocationId")
                                 .HasColumnType("uuid");
@@ -307,7 +308,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                                 .HasForeignKey("LocationId");
                         });
 
-                    b.OwnsOne("DirectoryService.Domain.Locations.Timezone", "Timezone", b1 =>
+                    b.OwnsOne("DirectoryService.Domain.Locations.ValueObjects.Timezone", "Timezone", b1 =>
                         {
                             b1.Property<Guid>("LocationId")
                                 .HasColumnType("uuid");
@@ -337,7 +338,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
             modelBuilder.Entity("DirectoryService.Domain.Positions.Position", b =>
                 {
-                    b.OwnsOne("DirectoryService.Domain.Positions.Description", "Description", b1 =>
+                    b.OwnsOne("DirectoryService.Domain.Positions.ValueObjects.Description", "Description", b1 =>
                         {
                             b1.Property<Guid>("PositionId")
                                 .HasColumnType("uuid");
@@ -355,7 +356,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                                 .HasForeignKey("PositionId");
                         });
 
-                    b.OwnsOne("DirectoryService.Domain.Positions.Name", "Name", b1 =>
+                    b.OwnsOne("DirectoryService.Domain.Positions.ValueObjects.Name", "Name", b1 =>
                         {
                             b1.Property<Guid>("PositionId")
                                 .HasColumnType("uuid");

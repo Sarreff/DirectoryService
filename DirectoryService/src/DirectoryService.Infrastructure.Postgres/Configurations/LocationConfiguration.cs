@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Locations;
+using DirectoryService.Domain.Locations.ValueObjects;
 using DirectoryService.Domain.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -15,6 +16,7 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.HasKey(l => l.Id).HasName("pk_locations");
 
         builder.Property(l => l.Id)
+            .HasConversion(l => l.Value, id => new LocationId(id))
             .ValueGeneratedNever()
             .HasColumnName("id");
 
@@ -28,9 +30,13 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
         builder.OwnsOne(l => l.Address, ab =>
         {
-            ab.Property(a => a.Value)
-                .IsRequired()
-                .HasColumnName("address");
+            ab.ToJson("address");
+
+            ab.Property(a => a.Country).IsRequired();
+            ab.Property(a => a.City).IsRequired();
+            ab.Property(a => a.Street).IsRequired();
+            ab.Property(a => a.Building);
+            ab.Property(a => a.OfficeNumber);
         });
 
         builder.OwnsOne(l => l.Timezone, tzb =>
@@ -51,6 +57,11 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.Property(l => l.UpdatedAt)
             .IsRequired()
             .HasColumnName("updated_at");
+
+        builder.HasMany(l => l.DepartmentLocations)
+            .WithOne()
+            .HasForeignKey(dl => dl.LocationId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Navigation(l => l.DepartmentLocations)
             .UsePropertyAccessMode(PropertyAccessMode.Field);

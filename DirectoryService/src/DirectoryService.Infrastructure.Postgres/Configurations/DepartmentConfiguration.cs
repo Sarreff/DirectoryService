@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Domain.Departments;
+using DirectoryService.Domain.Departments.ValueObjects;
 using DirectoryService.Domain.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -14,6 +15,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         builder.HasKey(d => d.Id).HasName("pk_departments");
 
         builder.Property(d => d.Id)
+            .HasConversion(d => d.Value, id => new DepartmentId(id))
             .ValueGeneratedNever()
             .HasColumnName("id");
 
@@ -34,6 +36,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         });
 
         builder.Property(d => d.ParentId)
+            .HasConversion(p => p!.Value, pid => new DepartmentId(pid))
             .IsRequired(false)
             .HasColumnName("parent_id");
 
@@ -64,6 +67,16 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         builder.Property(d => d.UpdatedAt)
             .IsRequired()
             .HasColumnName("updated_at");
+
+        builder.HasMany(d => d.DepartmentLocations)
+            .WithOne()
+            .HasForeignKey(dl => dl.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(d => d.DepartmentPositions)
+            .WithOne()
+            .HasForeignKey(dp => dp.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Navigation(d => d.DepartmentLocations)
             .UsePropertyAccessMode(PropertyAccessMode.Field);

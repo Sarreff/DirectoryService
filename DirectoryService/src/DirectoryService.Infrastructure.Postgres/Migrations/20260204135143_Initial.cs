@@ -42,11 +42,11 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
-                    address = table.Column<string>(type: "text", nullable: false),
                     timezone = table.Column<string>(type: "text", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    address = table.Column<string>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -85,13 +85,13 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         column: x => x.department_id,
                         principalTable: "departments",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_department_locations_locations_location_id",
                         column: x => x.location_id,
                         principalTable: "locations",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -110,20 +110,19 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         column: x => x.department_id,
                         principalTable: "departments",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_department_positions_positions_position_id",
                         column: x => x.position_id,
                         principalTable: "positions",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_department_locations_department_id_location_id",
+                name: "IX_department_locations_department_id",
                 table: "department_locations",
-                columns: new[] { "department_id", "location_id" },
-                unique: true);
+                column: "department_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_department_locations_location_id",
@@ -131,10 +130,9 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 column: "location_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_department_positions_department_id_position_id",
+                name: "IX_department_positions_department_id",
                 table: "department_positions",
-                columns: new[] { "department_id", "position_id" },
-                unique: true);
+                column: "department_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_department_positions_position_id",

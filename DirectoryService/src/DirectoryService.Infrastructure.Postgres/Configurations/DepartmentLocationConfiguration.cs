@@ -1,4 +1,6 @@
 ﻿using DirectoryService.Domain.Departments;
+using DirectoryService.Domain.Departments.ValueObjects;
+using DirectoryService.Domain.Locations.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,28 +15,18 @@ public class DepartmentLocationConfiguration : IEntityTypeConfiguration<Departme
         builder.HasKey(dl => dl.Id).HasName("pk_department_locations");
 
         builder.Property(dl => dl.Id)
+            .HasConversion(dl => dl.Value, id => new DepartmentLocationId(id))
             .ValueGeneratedNever()
             .HasColumnName("id");
 
         builder.Property(dl => dl.DepartmentId)
+            .HasConversion(d => d.Value, id => new DepartmentId(id))
             .IsRequired()
             .HasColumnName("department_id");
 
         builder.Property(dl => dl.LocationId)
+            .HasConversion(l => l.Value, id => new LocationId(id))
             .IsRequired()
             .HasColumnName("location_id");
-
-        builder.HasOne(dl => dl.Department)
-            .WithMany(d => d.DepartmentLocations)
-            .HasForeignKey(dl => dl.DepartmentId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasOne(dl => dl.Location)
-            .WithMany(l => l.DepartmentLocations)
-            .HasForeignKey(dl => dl.LocationId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasIndex(dl => new { dl.DepartmentId, dl.LocationId })
-            .IsUnique();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Positions;
+using DirectoryService.Domain.Positions.ValueObjects;
 using DirectoryService.Domain.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -15,6 +16,7 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
         builder.HasKey(p => p.Id).HasName("pk_positions");
 
         builder.Property(p => p.Id)
+            .HasConversion(p => p.Value, id => new PositionId(id))
             .ValueGeneratedNever()
             .HasColumnName("id");
 
@@ -45,6 +47,11 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
         builder.Property(p => p.UpdatedAt)
             .IsRequired()
             .HasColumnName("updated_at");
+
+        builder.HasMany(p => p.DepartmentPositions)
+            .WithOne()
+            .HasForeignKey(dp => dp.PositionId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Navigation(p => p.DepartmentPositions)
             .UsePropertyAccessMode(PropertyAccessMode.Field);

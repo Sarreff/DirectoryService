@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Domain.Departments;
+using DirectoryService.Domain.Locations.ValueObjects;
 
 namespace DirectoryService.Domain.Locations;
 
@@ -6,7 +7,7 @@ public sealed class Location
 {
     private readonly List<DepartmentLocation> _departmentLocations = [];
 
-    public Location(Guid id, Name name, Address address, Timezone timezone, bool isActive)
+    public Location(LocationId id, Name name, Address address, Timezone timezone, bool isActive)
     {
         Id = id;
         Name = name;
@@ -18,7 +19,7 @@ public sealed class Location
     // EF Core
     private Location() { }
 
-    public Guid Id { get; private set; }
+    public LocationId Id { get; private set; }
 
     public Name Name { get; private set; }
 

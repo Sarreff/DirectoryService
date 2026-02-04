@@ -1,28 +1,23 @@
-﻿using DirectoryService.Domain.Locations;
+﻿using DirectoryService.Domain.Departments.ValueObjects;
+using DirectoryService.Domain.Locations.ValueObjects;
 
 namespace DirectoryService.Domain.Departments;
 
 public sealed class DepartmentLocation
 {
-    public DepartmentLocation(Guid id, Department department, Location location)
+    public DepartmentLocation(DepartmentLocationId id, DepartmentId departmentId, LocationId locationId)
     {
         Id = id;
-        DepartmentId = department.Id;
-        Department = department;
-        LocationId = location.Id;
-        Location = location;
+        DepartmentId = departmentId;
+        LocationId = locationId;
     }
 
     // EF Core
     private DepartmentLocation() { }
 
-    public Guid Id { get; }
+    public DepartmentLocationId Id { get; }
 
-    public Guid DepartmentId { get; }
+    public DepartmentId DepartmentId { get; }
 
-    public Department Department { get; private set; }
-
-    public Guid LocationId { get; }
-
-    public Location Location { get; private set; }
+    public LocationId LocationId { get; }
 }
