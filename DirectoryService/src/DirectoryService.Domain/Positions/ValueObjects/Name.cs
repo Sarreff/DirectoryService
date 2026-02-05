@@ -1,13 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Shared;
 
-namespace DirectoryService.Domain.Positions;
+namespace DirectoryService.Domain.Positions.ValueObjects;
 
 public record Name
 {
-    private const int MIN_LENGTH = 3;
-    private const int MAX_LENGTH = 100;
-
     public string Value { get; }
 
     private Name(string value)
@@ -24,7 +21,7 @@ public record Name
             return GeneralErrors.ValueIsInvalid("Name");
         }
 
-        if (normalizedName.Length is < MIN_LENGTH or > MAX_LENGTH)
+        if (normalizedName.Length is < LengthConstants.LENGTH3 or > LengthConstants.LENGTH100)
         {
             return Error.Validation(
                 "name.value.length",

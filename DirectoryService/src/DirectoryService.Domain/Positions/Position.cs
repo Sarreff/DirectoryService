@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Domain.Departments;
+using DirectoryService.Domain.Positions.ValueObjects;
 
 namespace DirectoryService.Domain.Positions;
 
@@ -6,7 +7,7 @@ public sealed class Position
 {
     private readonly List<DepartmentPosition> _departmentPositions = [];
 
-    public Position(Guid id, Name name, Description description, bool isActive)
+    public Position(PositionId id, Name name, Description description, bool isActive)
     {
         Id = id;
         Name = name;
@@ -19,7 +20,7 @@ public sealed class Position
     // EF Core
     private Position() { }
 
-    public Guid Id { get; }
+    public PositionId Id { get; }
 
     public Name Name { get; private set; }
 

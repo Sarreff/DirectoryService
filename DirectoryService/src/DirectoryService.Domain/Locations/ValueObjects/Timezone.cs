@@ -2,7 +2,7 @@
 using DirectoryService.Domain.Shared;
 using TimeZoneConverter;
 
-namespace DirectoryService.Domain.Locations;
+namespace DirectoryService.Domain.Locations.ValueObjects;
 
 public record Timezone
 {
