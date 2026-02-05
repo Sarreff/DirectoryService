@@ -1,10 +1,9 @@
-﻿using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Domain.Departments.ValueObjects;
 
-public partial record Identifier
+public record Identifier
 {
     public string Value { get; }
 
@@ -35,7 +34,7 @@ public partial record Identifier
                 "identifier.value"));
         }
 
-        if (MyRegex().IsMatch(normalizedIdentifier))
+        if (!IdentifierRegex.LatinName().IsMatch(normalizedIdentifier))
         {
             messages.Add(new ErrorMessage(
                 "identifier.name",
@@ -48,7 +47,4 @@ public partial record Identifier
 
         return new Identifier(normalizedIdentifier);
     }
-
-    [GeneratedRegex(@"^[A-Za-z\s-]+$")]
-    private static partial Regex MyRegex();
 }

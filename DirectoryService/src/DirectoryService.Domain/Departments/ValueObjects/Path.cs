@@ -3,7 +3,7 @@ using DirectoryService.Domain.Shared;
 
 namespace DirectoryService.Domain.Departments.ValueObjects;
 
-public partial record Path
+public record Path
 {
     public string Value { get; }
 
