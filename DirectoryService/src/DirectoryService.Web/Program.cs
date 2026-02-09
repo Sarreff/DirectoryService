@@ -1,4 +1,5 @@
 using System.Globalization;
+using DirectoryService.Application.Configurations;
 using DirectoryService.Infrastructure.Postgres.Configurations;
 using DirectoryService.Web.Configurations;
 using Serilog;
@@ -16,7 +17,8 @@ try
 
     builder.Services
         .AddConfiguration(builder.Configuration)
-        .AddInfrastructureConfiguration(builder.Configuration);
+        .AddInfrastructureConfiguration(builder.Configuration)
+        .AddApplicationConfiguration();
 
     var app = builder.Build();
 
