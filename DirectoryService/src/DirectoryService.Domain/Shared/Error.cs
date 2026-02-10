@@ -1,6 +1,6 @@
 ﻿namespace DirectoryService.Domain.Shared;
 
-public record ErrorMessage(string Code, string Message, string? IvalidField);
+public record ErrorMessage(string Code, string Message, string? InvalidField);
 
 public record Error
 {

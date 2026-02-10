@@ -14,6 +14,8 @@ public sealed class Location
         Address = address;
         Timezone = timezone;
         IsActive = isActive;
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     // EF Core

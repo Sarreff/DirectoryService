@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DirectoryService.Application.Locations;
+using DirectoryService.Infrastructure.Postgres.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,8 @@ public static class InfrastructureDependencyInjection
     {
         services.AddScoped<DirectoryServiceDbContext>(_ =>
             new DirectoryServiceDbContext(configuration.GetConnectionString("DirectoryServiceDb")!));
+
+        services.AddScoped<ILocationsRepository, LocationsEfCoreRepository>();
 
         return services;
     }
