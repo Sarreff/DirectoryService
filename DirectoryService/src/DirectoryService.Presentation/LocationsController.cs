@@ -13,7 +13,7 @@ public class LocationsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromServices] ICommandHandler<Guid, CreateLocationCommand> handler,
-        [FromBody] CreateLocationDto request,
+        [FromBody] CreateLocationRequest request,
         CancellationToken cancellationToken)
     {
         var command = new CreateLocationCommand(request);

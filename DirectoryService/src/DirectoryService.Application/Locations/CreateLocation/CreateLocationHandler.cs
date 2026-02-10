@@ -21,20 +21,20 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
     public async Task<Result<Guid, Error>> Handle(CreateLocationCommand command, CancellationToken cancellationToken)
     {
         LocationId locationId = new(Guid.NewGuid());
-        var nameResult = Name.Create(command.CreateLocationDto.Name);
+        var nameResult = Name.Create(command.CreateLocationRequest.Name);
         if (nameResult.IsFailure)
             return nameResult.Error;
 
         var addressResult = Address.Create(
-            command.CreateLocationDto.AddressCountry,
-            command.CreateLocationDto.AddressCity,
-            command.CreateLocationDto.AddressStreet,
-            command.CreateLocationDto.AddressBuilding,
-            command.CreateLocationDto.AddressOfficeNumber);
+            command.CreateLocationRequest.AddressDto.AddressCountry,
+            command.CreateLocationRequest.AddressDto.AddressCity,
+            command.CreateLocationRequest.AddressDto.AddressStreet,
+            command.CreateLocationRequest.AddressDto.AddressBuilding,
+            command.CreateLocationRequest.AddressDto.AddressOfficeNumber);
         if (addressResult.IsFailure)
             return addressResult.Error;
 
-        var timezoneResult = Timezone.Create(command.CreateLocationDto.Timezone);
+        var timezoneResult = Timezone.Create(command.CreateLocationRequest.Timezone);
         if (timezoneResult.IsFailure)
             return timezoneResult.Error;
 
@@ -43,7 +43,7 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
             nameResult.Value,
             addressResult.Value,
             timezoneResult.Value,
-            command.CreateLocationDto.IsActive);
+            command.CreateLocationRequest.IsActive);
 
         await _locationsRepository.AddAsync(location, cancellationToken);
 
