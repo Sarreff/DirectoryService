@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Locations;
-using DirectoryService.Domain.Shared;
+using DirectoryService.Shared;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
 

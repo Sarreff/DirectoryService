@@ -2,7 +2,7 @@
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Locations.ValueObjects;
-using DirectoryService.Domain.Shared;
+using DirectoryService.Shared;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Locations.CreateLocation;
@@ -18,12 +18,12 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
         _logger = logger;
     }
 
-    public async Task<Result<Guid, Error>> Handle(CreateLocationCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Errors>> Handle(CreateLocationCommand command, CancellationToken cancellationToken)
     {
         LocationId locationId = new(Guid.NewGuid());
         var nameResult = Name.Create(command.CreateLocationRequest.Name);
         if (nameResult.IsFailure)
-            return nameResult.Error;
+            return nameResult.Error.ToErrors();
 
         var addressResult = Address.Create(
             command.CreateLocationRequest.AddressDto.AddressCountry,
@@ -32,11 +32,11 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
             command.CreateLocationRequest.AddressDto.AddressBuilding,
             command.CreateLocationRequest.AddressDto.AddressOfficeNumber);
         if (addressResult.IsFailure)
-            return addressResult.Error;
+            return addressResult.Error.ToErrors();
 
         var timezoneResult = Timezone.Create(command.CreateLocationRequest.Timezone);
         if (timezoneResult.IsFailure)
-            return timezoneResult.Error;
+            return timezoneResult.Error.ToErrors();
 
         Location location = new Location(
             locationId,

@@ -2,24 +2,25 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageVersion Include="CSharpFunctionalExtensions" Version="3.6.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-    <PackageVersion Include="Scrutor" Version="7.0.0" />
-    <PackageVersion Include="Serilog" Version="4.3.1-dev-02406" />
-    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
-    <PackageVersion Include="Serilog.Exceptions" Version="8.4.0" />
-    <PackageVersion Include="Serilog.Exceptions.EntityFrameworkCore" Version="8.4.0" />
-    <PackageVersion Include="Serilog.Extensions.Hosting" Version="10.0.0" />
-    <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.1-dev-02330" />
-    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageVersion Include="Serilog.Sinks.Debug" Version="3.0.0" />
-    <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.9" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />
-    <PackageVersion Include="TimeZoneConverter" Version="7.2.0" />
+    <PackageVersion Include="CSharpFunctionalExtensions" Version="3.6.0"/>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.11"/>
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0"/>
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4"/>
+    <PackageVersion Include="Scrutor" Version="7.0.0"/>
+    <PackageVersion Include="Serilog" Version="4.3.1"/>
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0"/>
+    <PackageVersion Include="Serilog.Exceptions" Version="8.4.0"/>
+    <PackageVersion Include="Serilog.Exceptions.EntityFrameworkCore" Version="8.4.0"/>
+    <PackageVersion Include="Serilog.Extensions.Hosting" Version="10.0.0"/>
+    <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.0"/>
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1"/>
+    <PackageVersion Include="Serilog.Sinks.Debug" Version="3.0.0"/>
+    <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556"/>
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9"/>
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.6"/>
+    <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.3"/>
+    <PackageVersion Include="TimeZoneConverter" Version="7.2.0"/>
   </ItemGroup>
 </Project>

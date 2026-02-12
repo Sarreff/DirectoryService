@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace DirectoryService.Domain.Shared;
+namespace DirectoryService.Shared;
 
-internal static partial class StringNormalization
+public static partial class StringNormalization
 {
     public static string Normalize(string value)
     {
