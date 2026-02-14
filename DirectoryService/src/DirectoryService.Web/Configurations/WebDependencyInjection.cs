@@ -1,4 +1,7 @@
-﻿using Serilog;
+﻿using DirectoryService.Presentation.Envelopes;
+using DirectoryService.Shared;
+using Microsoft.OpenApi.Models;
+using Serilog;
 using Serilog.Exceptions;
 
 namespace DirectoryService.Web.Configurations;
@@ -16,7 +19,25 @@ public static class WebDependencyInjection
 
     private static IServiceCollection AddOpenApiSpec(this IServiceCollection services)
     {
-        services.AddOpenApi();
+        services.AddOpenApi(options =>
+        {
+            options.AddSchemaTransformer((schema, context, _) =>
+            {
+                if (context.JsonTypeInfo.Type == typeof(Envelope<Errors>))
+                {
+                    if (schema.Properties.TryGetValue("errors", out var errorsProp))
+                    {
+                        errorsProp.Items.Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.Schema,
+                            Id = "Error",
+                        };
+                    }
+                }
+
+                return Task.CompletedTask;
+            });
+        });
         services.AddControllers();
 
         return services;

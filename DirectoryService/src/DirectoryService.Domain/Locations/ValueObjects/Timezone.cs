@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Shared;
+using DirectoryService.Shared;
 using TimeZoneConverter;
 
 namespace DirectoryService.Domain.Locations.ValueObjects;

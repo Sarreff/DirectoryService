@@ -1,4 +1,4 @@
-﻿using DirectoryService.Domain.Shared;
+﻿using DirectoryService.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.Presentation.ResponseExtensions;

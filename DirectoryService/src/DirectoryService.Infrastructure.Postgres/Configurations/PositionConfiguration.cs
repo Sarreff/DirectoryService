@@ -1,7 +1,6 @@
-﻿using DirectoryService.Domain.Departments;
-using DirectoryService.Domain.Positions;
+﻿using DirectoryService.Domain.Positions;
 using DirectoryService.Domain.Positions.ValueObjects;
-using DirectoryService.Domain.Shared;
+using DirectoryService.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
