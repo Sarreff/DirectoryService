@@ -16,14 +16,14 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
-                    identifier = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     parent_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    path = table.Column<string>(type: "text", nullable: false),
                     depth = table.Column<short>(type: "smallint", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    identifier = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    path = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -41,11 +41,11 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
-                    timezone = table.Column<string>(type: "text", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    timezone = table.Column<string>(type: "text", nullable: false),
                     address = table.Column<string>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
@@ -58,11 +58,11 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {

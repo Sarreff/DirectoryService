@@ -3,7 +3,7 @@ using DirectoryService.Shared;
 
 namespace DirectoryService.Domain.Positions.ValueObjects;
 
-public record Description
+public sealed record Description
 {
     public string? Value { get; }
 

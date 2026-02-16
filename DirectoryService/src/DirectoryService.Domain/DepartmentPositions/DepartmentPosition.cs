@@ -1,7 +1,8 @@
-﻿using DirectoryService.Domain.Departments.ValueObjects;
+﻿using DirectoryService.Domain.DepartmentPositions.ValueObjects;
+using DirectoryService.Domain.Departments.ValueObjects;
 using DirectoryService.Domain.Positions.ValueObjects;
 
-namespace DirectoryService.Domain.Departments;
+namespace DirectoryService.Domain.DepartmentPositions;
 
 public sealed class DepartmentPosition
 {

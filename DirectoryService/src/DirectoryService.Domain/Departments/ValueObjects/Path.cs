@@ -3,8 +3,10 @@ using DirectoryService.Shared;
 
 namespace DirectoryService.Domain.Departments.ValueObjects;
 
-public record Path
+public sealed record Path
 {
+    private const char SEPARATOR = '/';
+
     public string Value { get; }
 
     private Path(string value)
@@ -12,15 +14,13 @@ public record Path
         Value = value;
     }
 
-    public static Result<Path, Error> Create(string value)
+    public static Path CreateParent(Identifier identifier)
     {
-        string normalizedPath = StringNormalization.Normalize(value);
+        return new Path(identifier.Value);
+    }
 
-        if (string.IsNullOrWhiteSpace(normalizedPath))
-        {
-            return GeneralErrors.ValueIsInvalid("Path");
-        }
-
-        return new Path(normalizedPath);
+    public Path CreateChild(Identifier childIdentifier)
+    {
+        return new Path(Value + SEPARATOR + childIdentifier.Value);
     }
 }
