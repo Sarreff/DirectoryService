@@ -4,7 +4,7 @@ using TimeZoneConverter;
 
 namespace DirectoryService.Domain.Locations.ValueObjects;
 
-public record Timezone
+public sealed record Timezone
 {
     public string Value { get; }
 

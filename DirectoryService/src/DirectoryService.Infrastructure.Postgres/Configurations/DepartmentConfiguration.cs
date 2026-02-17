@@ -19,7 +19,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .ValueGeneratedNever()
             .HasColumnName("id");
 
-        builder.OwnsOne(d => d.Name, nb =>
+        builder.ComplexProperty(d => d.Name, nb =>
         {
             nb.Property(n => n.Value)
                 .IsRequired()
@@ -27,7 +27,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
                 .HasColumnName("name");
         });
 
-        builder.OwnsOne(d => d.Identifier, ib =>
+        builder.ComplexProperty(d => d.Identifier, ib =>
         {
             ib.Property(i => i.Value)
                 .IsRequired()
@@ -40,12 +40,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .IsRequired(false)
             .HasColumnName("parent_id");
 
-        builder.HasOne<Department>()
-            .WithMany()
-            .HasForeignKey(d => d.ParentId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.OwnsOne(d => d.Path, pb =>
+        builder.ComplexProperty(d => d.Path, pb =>
         {
             pb.Property(p => p.Value)
                 .IsRequired()
@@ -68,18 +63,27 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .IsRequired()
             .HasColumnName("updated_at");
 
+        builder.HasMany(d => d.ChildrenDepartments)
+            .WithOne()
+            .IsRequired(false)
+            .HasForeignKey(d => d.ParentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(d => d.ChildrenDepartments)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
         builder.HasMany(d => d.DepartmentLocations)
             .WithOne()
             .HasForeignKey(dl => dl.DepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Navigation(d => d.DepartmentLocations)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
         builder.HasMany(d => d.DepartmentPositions)
             .WithOne()
             .HasForeignKey(dp => dp.DepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Navigation(d => d.DepartmentLocations)
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.Navigation(d => d.DepartmentPositions)
             .UsePropertyAccessMode(PropertyAccessMode.Field);

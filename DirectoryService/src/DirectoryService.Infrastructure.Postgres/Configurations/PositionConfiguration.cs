@@ -19,7 +19,7 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
             .ValueGeneratedNever()
             .HasColumnName("id");
 
-        builder.OwnsOne(p => p.Name, nb =>
+        builder.ComplexProperty(p => p.Name, nb =>
         {
             nb.Property(n => n.Value)
                 .IsRequired()

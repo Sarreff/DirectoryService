@@ -19,7 +19,7 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .ValueGeneratedNever()
             .HasColumnName("id");
 
-        builder.OwnsOne(l => l.Name, nb =>
+        builder.ComplexProperty(l => l.Name, nb =>
         {
             nb.Property(n => n.Value)
                 .IsRequired()
@@ -38,7 +38,7 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             ab.Property(a => a.OfficeNumber);
         });
 
-        builder.OwnsOne(l => l.Timezone, tzb =>
+        builder.ComplexProperty(l => l.Timezone, tzb =>
         {
             tzb.Property(t => t.Value)
                 .IsRequired()

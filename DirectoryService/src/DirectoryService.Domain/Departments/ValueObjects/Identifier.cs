@@ -3,7 +3,7 @@ using DirectoryService.Shared;
 
 namespace DirectoryService.Domain.Departments.ValueObjects;
 
-public record Identifier
+public sealed record Identifier
 {
     public string Value { get; }
 
