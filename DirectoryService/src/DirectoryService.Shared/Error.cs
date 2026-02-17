@@ -14,6 +14,8 @@ public record Error
         Type = type;
     }
 
+    public string GetMessage() => string.Join(";", Messages.Select(m => m.ToString()));
+
     public static Error Validation(string code, string message, string? invalidField = null) =>
         new([new ErrorMessage(code, message, invalidField)], ErrorType.VALIDATION);
 
