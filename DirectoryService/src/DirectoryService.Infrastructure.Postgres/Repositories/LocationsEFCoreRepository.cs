@@ -2,23 +2,33 @@
 using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Shared;
+using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
 
 public class LocationsEfCoreRepository : ILocationsRepository
 {
     private readonly DirectoryServiceDbContext _context;
+    private readonly ILogger<LocationsEfCoreRepository> _logger;
 
-    public LocationsEfCoreRepository(DirectoryServiceDbContext context)
+    public LocationsEfCoreRepository(DirectoryServiceDbContext context, ILogger<LocationsEfCoreRepository> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public async Task<Result<Guid, Error>> AddAsync(Location location, CancellationToken cancellationToken)
     {
-        await _context.Locations.AddAsync(location, cancellationToken);
+        try
+        {
+            await _context.Locations.AddAsync(location, cancellationToken);
 
-        await _context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("The operation to add the location with id: {LocationId} has failed.", location.Id.Value);
+        }
 
         return location.Id.Value;
     }
