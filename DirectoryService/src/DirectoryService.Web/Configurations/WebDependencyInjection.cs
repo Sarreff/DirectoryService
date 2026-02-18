@@ -1,4 +1,5 @@
-﻿using DirectoryService.Presentation.Envelopes;
+﻿using System.Text.Json.Serialization;
+using DirectoryService.Presentation.Envelopes;
 using DirectoryService.Shared;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -38,7 +39,15 @@ public static class WebDependencyInjection
                 return Task.CompletedTask;
             });
         });
-        services.AddControllers();
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+        services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
 
         return services;
     }

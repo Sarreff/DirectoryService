@@ -47,7 +47,7 @@ public class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand
 
         await _locationsRepository.AddAsync(location, cancellationToken);
 
-        _logger.LogInformation("Location created with id {locationId.Value}", locationId.Value);
+        _logger.LogInformation("Location created with id {LocationId}", locationId.Value);
 
         return locationId.Value;
     }
