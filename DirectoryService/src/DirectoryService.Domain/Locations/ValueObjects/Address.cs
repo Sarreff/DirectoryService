@@ -87,4 +87,7 @@ public sealed record Address
             building,
             officeNumber);
     }
+
+    public override string ToString() =>
+        $"{Country}, {City}, {Street}, {Building}, {OfficeNumber}";
 }

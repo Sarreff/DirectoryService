@@ -1,12 +1,21 @@
-﻿namespace DirectoryService.Shared;
+﻿using System.Text.Json.Serialization;
 
-public record ErrorMessage(string Code, string Message, string? InvalidField);
+namespace DirectoryService.Shared;
+
+public record ErrorMessage(string Code, string Message, string? InvalidField = null);
 
 public record Error
 {
     public IReadOnlyList<ErrorMessage> Messages { get; } = [];
 
     public ErrorType Type { get; }
+
+    [JsonConstructor]
+    private Error(IReadOnlyList<ErrorMessage> messages, ErrorType type)
+    {
+        Messages = messages;
+        Type = type;
+    }
 
     private Error(IEnumerable<ErrorMessage> messages, ErrorType type)
     {

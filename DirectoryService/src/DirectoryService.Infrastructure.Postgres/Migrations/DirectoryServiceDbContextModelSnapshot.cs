@@ -147,24 +147,25 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<string>("FullPath")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("full_path");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasColumnName("is_active");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("name");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
-
-                    b.ComplexProperty<Dictionary<string, object>>("Name", "DirectoryService.Domain.Locations.Location.Name#Name", b1 =>
-                        {
-                            b1.IsRequired();
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(120)
-                                .HasColumnType("character varying(120)")
-                                .HasColumnName("name");
-                        });
 
                     b.ComplexProperty<Dictionary<string, object>>("Timezone", "DirectoryService.Domain.Locations.Location.Timezone#Timezone", b1 =>
                         {
@@ -178,6 +179,14 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_locations");
+
+                    b.HasIndex("FullPath")
+                        .IsUnique()
+                        .HasDatabaseName("ix_location_address_full_path");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_location_name");
 
                     b.ToTable("locations", (string)null);
                 });

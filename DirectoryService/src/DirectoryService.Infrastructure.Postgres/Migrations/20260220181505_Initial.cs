@@ -41,10 +41,11 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    full_path = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
                     timezone = table.Column<string>(type: "text", nullable: false),
                     address = table.Column<string>(type: "jsonb", nullable: false)
                 },
@@ -143,6 +144,18 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                 name: "IX_departments_parent_id",
                 table: "departments",
                 column: "parent_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_location_address_full_path",
+                table: "locations",
+                column: "full_path",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_location_name",
+                table: "locations",
+                column: "name",
+                unique: true);
         }
 
         /// <inheritdoc />

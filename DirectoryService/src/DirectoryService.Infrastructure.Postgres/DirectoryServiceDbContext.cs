@@ -9,11 +9,9 @@ namespace DirectoryService.Infrastructure.Postgres;
 
 public class DirectoryServiceDbContext : DbContext
 {
-    private readonly string _connectionString;
-
-    public DirectoryServiceDbContext(string connectionString)
+    public DirectoryServiceDbContext(DbContextOptions<DirectoryServiceDbContext> options)
+        : base(options)
     {
-        _connectionString = connectionString;
     }
 
     public DbSet<Department> Departments => Set<Department>();
@@ -25,13 +23,6 @@ public class DirectoryServiceDbContext : DbContext
     public DbSet<DepartmentLocation> DepartmentLocations => Set<DepartmentLocation>();
 
     public DbSet<DepartmentPosition> DepartmentPositions => Set<DepartmentPosition>();
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder
-            .UseNpgsql(_connectionString)
-            .EnableSensitiveDataLogging();
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

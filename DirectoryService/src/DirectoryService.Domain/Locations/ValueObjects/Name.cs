@@ -7,7 +7,7 @@ public sealed record Name
 {
     public string Value { get; }
 
-    private Name(string value)
+    public Name(string value)
     {
         Value = value;
     }

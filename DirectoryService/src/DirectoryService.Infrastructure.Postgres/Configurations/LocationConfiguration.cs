@@ -6,6 +6,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DirectoryService.Infrastructure.Postgres.Configurations;
 
+public static class Index
+{
+    public const string NAME = "ix_location_name";
+    public const string ADDRESSFULLPATH = "ix_location_address_full_path";
+}
+
 public class LocationConfiguration : IEntityTypeConfiguration<Location>
 {
     public void Configure(EntityTypeBuilder<Location> builder)
@@ -19,13 +25,13 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .ValueGeneratedNever()
             .HasColumnName("id");
 
-        builder.ComplexProperty(l => l.Name, nb =>
-        {
-            nb.Property(n => n.Value)
-                .IsRequired()
-                .HasMaxLength(LengthConstants.LENGTH120)
-                .HasColumnName("name");
-        });
+        builder.Property(l => l.Name)
+            .HasConversion(
+                n => n.Value,
+                v => new Name(v))
+            .IsRequired()
+            .HasMaxLength(LengthConstants.LENGTH120)
+            .HasColumnName("name");
 
         builder.OwnsOne(l => l.Address, ab =>
         {
@@ -37,6 +43,11 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             ab.Property(a => a.Building);
             ab.Property(a => a.OfficeNumber);
         });
+
+        builder.Property(l => l.FullPath)
+            .IsRequired()
+            .HasMaxLength(1000)
+            .HasColumnName("full_path");
 
         builder.ComplexProperty(l => l.Timezone, tzb =>
         {
@@ -64,5 +75,15 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
         builder.Navigation(l => l.DepartmentLocations)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasIndex(l => l.Name)
+            .IsUnique()
+            .HasDatabaseName(Index.NAME)
+            .HasDatabaseName(Index.NAME) // Это НЕ имя constraint, а имя индекса
+            .HasFilter(null);
+
+        builder.HasIndex(l => l.FullPath)
+            .IsUnique()
+            .HasDatabaseName(Index.ADDRESSFULLPATH);
     }
 }

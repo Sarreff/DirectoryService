@@ -10,7 +10,9 @@
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Exceptions" />
     <PackageReference Include="Serilog.Exceptions.EntityFrameworkCore" />
+    <PackageReference Include="Serilog.Expressions" />
     <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Filters.Expressions" />
     <PackageReference Include="Serilog.Settings.Configuration" />
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="Serilog.Sinks.Debug" />

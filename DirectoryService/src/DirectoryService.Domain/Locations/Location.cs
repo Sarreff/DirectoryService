@@ -17,7 +17,14 @@ public sealed class Location
         IsActive = isActive;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
+        FullPath = CreateFullPath(address);
     }
+
+    private static string CreateFullPath(Address address) =>
+        $"{Normalize(address.Country)}, {Normalize(address.City)}, {Normalize(address.Street)}, {address.Building}, {address.OfficeNumber}";
+
+    private static string Normalize(string value) =>
+        value?.Trim().ToLowerInvariant() ?? string.Empty;
 
     // EF Core
     private Location() { }
@@ -27,6 +34,8 @@ public sealed class Location
     public Name Name { get; private set; }
 
     public Address Address { get; private set; }
+
+    public string FullPath { get; private set; }
 
     public Timezone Timezone { get; private set; }
 
