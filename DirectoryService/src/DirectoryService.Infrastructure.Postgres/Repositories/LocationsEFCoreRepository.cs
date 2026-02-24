@@ -2,7 +2,10 @@
 using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
+using Index = DirectoryService.Infrastructure.Postgres.Configurations.Index;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
 
@@ -25,9 +28,59 @@ public class LocationsEfCoreRepository : ILocationsRepository
 
             await _context.SaveChangesAsync(cancellationToken);
         }
+        catch (DbUpdateException ex)
+        {
+            PostgresException? pgEx = FindPostgresException(ex);
+
+            if (pgEx?.SqlState == PostgresErrorCodes.UniqueViolation)
+            {
+                if (string.Equals(
+                        pgEx.ConstraintName,
+                        Index.NAME,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.LogInformation(
+                        "Unique name violation for location '{Name}'",
+                        location.Name.Value);
+
+                    return LocationErrors.NameConflict(location.Name.Value);
+                }
+
+                if (string.Equals(
+                        pgEx.ConstraintName,
+                        "ix_location_address_full_path",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.LogInformation(
+                        "Unique address violation for location '{Address}'",
+                        location.Address.ToString());
+
+                    return LocationErrors.AddressConflict();
+                }
+            }
+
+            _logger.LogError(
+                ex,
+                "Database update error while creating location with name {Name}",
+                location.Name.Value);
+
+            return LocationErrors.DatabaseError();
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(
+                ex,
+                "Operation was cancelled while creating location with name {Name}", location.Name.Value);
+
+            return LocationErrors.OperationCancelled();
+        }
         catch (Exception ex)
         {
-            _logger.LogError("The operation to add the location with id: {LocationId} has failed.", location.Id.Value);
+            _logger.LogError(
+                ex,
+                "Unexpected error while creating location with name {Name}", location.Name.Value);
+
+            return LocationErrors.DatabaseError();
         }
 
         return location.Id.Value;
@@ -41,4 +94,18 @@ public class LocationsEfCoreRepository : ILocationsRepository
 
     public Task<Result<Guid, Error>> DeleteAsync(Guid locationId, CancellationToken cancellationToken)
         => throw new NotImplementedException();
+
+    private static PostgresException? FindPostgresException(Exception ex)
+    {
+        Exception? current = ex;
+        while (current != null)
+        {
+            if (current is PostgresException pgEx)
+                return pgEx;
+
+            current = current.InnerException;
+        }
+
+        return null;
+    }
 }

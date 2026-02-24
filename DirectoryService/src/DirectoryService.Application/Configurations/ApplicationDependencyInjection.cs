@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Application.Abstractions;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DirectoryService.Application.Configurations;
@@ -7,9 +8,9 @@ public static class ApplicationDependencyInjection
 {
     public static IServiceCollection AddApplicationConfiguration(this IServiceCollection services)
     {
-        // services.AddValidatorsFromAssembly(typeof(ApplicationDependencyInjection).Assembly);
-
         var assembly = typeof(ApplicationDependencyInjection).Assembly;
+
+        services.AddValidatorsFromAssembly(assembly);
 
         services.Scan(scan => scan.FromAssemblies(assembly)
             .AddClasses(classes => classes
