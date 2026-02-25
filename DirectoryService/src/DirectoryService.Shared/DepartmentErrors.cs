@@ -21,4 +21,14 @@ public static class DepartmentErrors
 
     public static Error OperationCancelled() =>
         Error.Failure(new ErrorMessage("department.operation.cancelled", "Operation was cancelled"));
+
+    public static Error DepartmentsNotFound() =>
+        Error.NotFound(new ErrorMessage(
+            "departments.notfound",
+            "No departments were found"));
+
+    public static Error DepartmentsNotFoundOrInactive() =>
+        Error.NotFound(new ErrorMessage(
+            "departments.notfound.inactive",
+            "Departments were not found or they are inactive"));
 }

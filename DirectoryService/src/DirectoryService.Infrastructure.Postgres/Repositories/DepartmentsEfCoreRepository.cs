@@ -10,7 +10,7 @@ using Npgsql;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
 
-public class DepartmentsEfCoreRepository : IDepartmentRepository
+public class DepartmentsEfCoreRepository : IDepartmentsRepository
 {
     private readonly DirectoryServiceDbContext _context;
     private readonly ILogger<DepartmentsEfCoreRepository> _logger;
@@ -127,6 +127,37 @@ public class DepartmentsEfCoreRepository : IDepartmentRepository
 
     public Task<Result<Guid, Error>> DeleteAsync(Guid departmentId, CancellationToken cancellationToken)
         => throw new NotImplementedException();
+
+    public async Task<Result<bool, Error>> AllDepartmentsExistAndActiveAsync(
+        IEnumerable<DepartmentId> departmentIds,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            int existingCount = await _context.Departments
+                .CountAsync(
+                    d =>
+                    departmentIds.Contains(d.Id) &&
+                    d.IsActive,
+                    cancellationToken);
+
+            if (existingCount == departmentIds.Count())
+            {
+                return true;
+            }
+
+            _logger.LogError("Some departments were not found or inactive in the database");
+            return DepartmentErrors.DepartmentsNotFoundOrInactive();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Unexpected error while checking active departments existing in database");
+
+            return DepartmentErrors.DatabaseError();
+        }
+    }
 
     private static PostgresException? FindPostgresException(Exception ex)
     {

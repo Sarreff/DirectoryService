@@ -17,18 +17,18 @@ namespace DirectoryService.Application.Departments.CreateDepartment;
 
 public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCommand>
 {
-    private readonly IDepartmentRepository _departmentRepository;
+    private readonly IDepartmentsRepository _departmentsRepository;
     private readonly ILocationsRepository _locationsRepository;
     private readonly IValidator<CreateDepartmentCommand> _validator;
     private readonly ILogger<CreateDepartmentHandler> _logger;
 
     public CreateDepartmentHandler(
-        IDepartmentRepository departmentRepository,
+        IDepartmentsRepository departmentsRepository,
         ILocationsRepository locationsRepository,
         IValidator<CreateDepartmentCommand> validator,
         ILogger<CreateDepartmentHandler> logger)
     {
-        _departmentRepository = departmentRepository;
+        _departmentsRepository = departmentsRepository;
         _locationsRepository = locationsRepository;
         _validator = validator;
         _logger = logger;
@@ -78,7 +78,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
         }
         else
         {
-            var departmentParent = await _departmentRepository
+            var departmentParent = await _departmentsRepository
                 .GetByIdAsync(parentId.Value, cancellationToken);
             if (departmentParent.IsFailure)
             {
@@ -97,7 +97,7 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
         if (departmentResult.IsFailure)
             return departmentResult.Error.ToErrors();
 
-        var addResult = await _departmentRepository.AddAsync(departmentResult.Value, cancellationToken);
+        var addResult = await _departmentsRepository.AddAsync(departmentResult.Value, cancellationToken);
         if (addResult.IsFailure)
             return addResult.Error.ToErrors();
 
