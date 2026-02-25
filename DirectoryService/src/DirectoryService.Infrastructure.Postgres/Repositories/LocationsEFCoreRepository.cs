@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Locations;
+using DirectoryService.Domain.Locations.ValueObjects;
 using DirectoryService.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -94,6 +95,34 @@ public class LocationsEfCoreRepository : ILocationsRepository
 
     public Task<Result<Guid, Error>> DeleteAsync(Guid locationId, CancellationToken cancellationToken)
         => throw new NotImplementedException();
+
+    public async Task<Result<bool, Error>> AllLocationsExistAsync(
+        IEnumerable<LocationId> locationIds,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            int existingCount = await _context.Locations
+                .CountAsync(l => locationIds.Contains(l.Id), cancellationToken);
+
+            if (existingCount == locationIds.Count())
+            {
+                return true;
+            }
+
+            _logger.LogError("Some locations were not found in the database");
+            return LocationErrors.LocationsNotFound();
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Unexpected error while checking locations existing in database");
+
+            return LocationErrors.DatabaseError();
+        }
+    }
 
     private static PostgresException? FindPostgresException(Exception ex)
     {

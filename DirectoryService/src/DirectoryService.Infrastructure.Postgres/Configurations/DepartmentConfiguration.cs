@@ -6,6 +6,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DirectoryService.Infrastructure.Postgres.Configurations;
 
+public static class DepartmentIndex
+{
+    public const string NAME = "ix_department_name";
+}
+
 public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 {
     public void Configure(EntityTypeBuilder<Department> builder)

@@ -21,4 +21,14 @@ public static class LocationErrors
             "location.address.conflict",
             $"Location with this address already exists",
             "address"));
+
+    public static Error NoLocationsProvided() =>
+        Error.NotFound(new ErrorMessage(
+            "locations.empty",
+            "No locations were provided"));
+
+    public static Error LocationsNotFound() =>
+        Error.NotFound(new ErrorMessage(
+            "locations.notfound",
+            "No locations were found"));
 }
