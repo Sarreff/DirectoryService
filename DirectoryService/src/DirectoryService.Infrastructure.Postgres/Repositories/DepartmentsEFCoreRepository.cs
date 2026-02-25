@@ -41,11 +41,23 @@ public class DepartmentsEfCoreRepository : IDepartmentRepository
                         StringComparison.InvariantCultureIgnoreCase))
                 {
                     _logger.LogInformation(
-                        "Unique name violation for department '{Name}'",
+                        "Unique name violation for department with name: '{Name}'",
                         department.Name.Value);
+
+                    return DepartmentErrors.NameConflict(department.Name.Value);
                 }
 
-                return DepartmentErrors.NameConflict(department.Name.Value);
+                if (string.Equals(
+                        pgEx.ConstraintName,
+                        DepartmentIndex.IDENTIFIER,
+                        StringComparison.InvariantCultureIgnoreCase))
+                {
+                    _logger.LogInformation(
+                        "Unique identifier violation for department with identifier: '{Identifier}'",
+                        department.Identifier.Value);
+
+                    return DepartmentErrors.IdentifierConflict(department.Identifier.Value);
+                }
             }
 
             _logger.LogError(

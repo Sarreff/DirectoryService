@@ -8,6 +8,12 @@ public static class DepartmentErrors
             $"Department with name {name} already exists",
             "name"));
 
+    public static Error IdentifierConflict(string identifier) =>
+        Error.Conflict(new ErrorMessage(
+            "department.identifier.conflict",
+            $"Department with identifier {identifier} already exists",
+            "identifier"));
+
     public static Error DatabaseError() =>
         Error.Failure(new ErrorMessage(
             "department.database.error",
