@@ -15,7 +15,7 @@ public interface ILocationsRepository
 
     Task<Result<Guid, Error>> DeleteAsync(Guid locationId, CancellationToken cancellationToken);
 
-    Task<Result<bool, Error>> AllLocationsExistAsync(
+    Task<Result<bool, Error>> AllLocationsExistAndActiveAsync(
         IEnumerable<LocationId> locations,
         CancellationToken cancellationToken);
 }

@@ -5,6 +5,7 @@ using DirectoryService.Domain.DepartmentPositions;
 using DirectoryService.Domain.DepartmentPositions.ValueObjects;
 using DirectoryService.Domain.Departments.ValueObjects;
 using DirectoryService.Domain.Locations;
+using DirectoryService.Domain.Locations.ValueObjects;
 using DirectoryService.Domain.Positions;
 using DirectoryService.Shared;
 using Name = DirectoryService.Domain.Departments.ValueObjects.Name;
@@ -66,18 +67,16 @@ public sealed class Department
 
     public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
 
-    public void AddLocation(Location location)
+    public UnitResult<Error> UpdateDepartmentLocations(IEnumerable<LocationId> locationIds)
     {
-        // добавить проверку на дубли
-        var newDepartmentLocation = new DepartmentLocation(new DepartmentLocationId(Guid.NewGuid()), Id, location.Id);
-        _departmentLocations.Add(newDepartmentLocation);
-    }
+        _departmentLocations.Clear();
 
-    public void AddPosition(Position position)
-    {
-        // добавить проверку на дубли
-        var newDepartmentPosition = new DepartmentPosition(new DepartmentPositionId(Guid.NewGuid()), Id, position.Id);
-        _departmentPositions.Add(newDepartmentPosition);
+        foreach (var locationId in locationIds)
+        {
+            _departmentLocations.Add(new DepartmentLocation(new DepartmentLocationId(Guid.NewGuid()), Id, locationId));
+        }
+
+        return UnitResult.Success<Error>();
     }
 
     public static Result<Department, Error> CreateParent(

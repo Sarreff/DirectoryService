@@ -50,7 +50,8 @@ public class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCom
 
         var locationIds = command.CreateDepartmentRequest.LocationsId
             .Select(l => new LocationId(l)).ToList();
-        var locationsExistResult = await _locationsRepository.AllLocationsExistAsync(locationIds, cancellationToken);
+        var locationsExistResult = await _locationsRepository
+            .AllLocationsExistAndActiveAsync(locationIds, cancellationToken);
         if (locationsExistResult.IsFailure)
             return locationsExistResult.Error.ToErrors();
 

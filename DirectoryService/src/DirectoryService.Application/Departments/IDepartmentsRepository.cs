@@ -13,7 +13,15 @@ public interface IDepartmentsRepository
 
     Task<Result<Department, Error>> GetByIdAsync(Guid departmentId, CancellationToken cancellationToken);
 
+    Task<Result<Department, Error>> GetByIdWithDepartmentLocationsAsync(
+        Guid departmentId,
+        CancellationToken cancellationToken);
+
     Task<Result<Guid, Error>> DeleteAsync(Guid departmentId, CancellationToken cancellationToken);
+
+    Task<UnitResult<Error>> DeleteDepartmentLocationsByDepartmentId(
+        DepartmentId departmentId,
+        CancellationToken cancellationToken);
 
     Task<Result<bool, Error>> AllDepartmentsExistAndActiveAsync(
         IEnumerable<DepartmentId> departmentIds,

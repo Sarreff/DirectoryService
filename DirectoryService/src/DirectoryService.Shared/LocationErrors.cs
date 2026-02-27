@@ -31,4 +31,9 @@ public static class LocationErrors
         Error.NotFound(new ErrorMessage(
             "locations.notfound",
             "No locations were found"));
+
+    public static Error LocationsNotFoundOrInactive() =>
+        Error.NotFound(new ErrorMessage(
+            "locations.notfound.inactive",
+            "Some locations were not found in the database or they are inactive"));
 }
