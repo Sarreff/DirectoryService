@@ -6,6 +6,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DirectoryService.Infrastructure.Postgres.Configurations;
 
+public static class DepartmentIndex
+{
+    public const string NAME = "ix_department_name";
+    public const string IDENTIFIER = "ix_department_identifier";
+}
+
 public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 {
     public void Configure(EntityTypeBuilder<Department> builder)
@@ -19,24 +25,26 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .ValueGeneratedNever()
             .HasColumnName("id");
 
-        builder.ComplexProperty(d => d.Name, nb =>
-        {
-            nb.Property(n => n.Value)
-                .IsRequired()
-                .HasMaxLength(LengthConstants.LENGTH150)
-                .HasColumnName("name");
-        });
+        builder.Property(d => d.Name)
+            .HasConversion(
+                n => n.Value,
+                v => new Name(v))
+            .IsRequired()
+            .HasMaxLength(LengthConstants.LENGTH150)
+            .HasColumnName("name");
 
-        builder.ComplexProperty(d => d.Identifier, ib =>
-        {
-            ib.Property(i => i.Value)
-                .IsRequired()
-                .HasMaxLength(LengthConstants.LENGTH150)
-                .HasColumnName("identifier");
-        });
+        builder.Property(d => d.Identifier)
+            .HasConversion(
+                i => i.Value,
+                v => new Identifier(v))
+            .IsRequired()
+            .HasMaxLength(LengthConstants.LENGTH150)
+            .HasColumnName("identifier");
 
         builder.Property(d => d.ParentId)
-            .HasConversion(p => p!.Value, pid => new DepartmentId(pid))
+            .HasConversion(
+                p => p!.Value,
+                pid => new DepartmentId(pid))
             .IsRequired(false)
             .HasColumnName("parent_id");
 
@@ -87,5 +95,17 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 
         builder.Navigation(d => d.DepartmentPositions)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasIndex(d => d.Name)
+            .IsUnique()
+            .HasDatabaseName(DepartmentIndex.NAME)
+            .HasDatabaseName(DepartmentIndex.NAME) // Это НЕ имя constraint, а имя индекса
+            .HasFilter(null);
+
+        builder.HasIndex(d => d.Identifier)
+            .IsUnique()
+            .HasDatabaseName(DepartmentIndex.IDENTIFIER)
+            .HasDatabaseName(DepartmentIndex.IDENTIFIER)
+            .HasFilter(null);
     }
 }

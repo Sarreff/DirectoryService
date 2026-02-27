@@ -7,7 +7,7 @@ public sealed record Identifier
 {
     public string Value { get; }
 
-    private Identifier(string value)
+    public Identifier(string value)
     {
         Value = value;
     }

@@ -11,7 +11,7 @@ public static class GeneralErrors
     public static Error NotFound(Guid? id = null, string? name = null)
     {
         string forId = id == null ? string.Empty : $" by Id '{id}'";
-        return Error.NotFound("record.not.found", $"{name ?? "record"} not found{forId}");
+        return Error.NotFound("record.not.found", $"{name ?? "Record"} not found{forId}");
     }
 
     public static Error ValueIsRequired(string? name = null)
@@ -28,5 +28,10 @@ public static class GeneralErrors
     public static Error Failure(string? message = null)
     {
         return Error.Failure("server.failure", message ?? "Server error");
+    }
+
+    public static Error DuplicatesFound(string message)
+    {
+        return Error.Conflict("duplicates", $"Duplicates found in {message}");
     }
 }

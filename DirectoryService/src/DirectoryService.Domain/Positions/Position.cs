@@ -1,5 +1,4 @@
 ﻿using DirectoryService.Domain.DepartmentPositions;
-using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Positions.ValueObjects;
 
 namespace DirectoryService.Domain.Positions;
@@ -8,14 +7,19 @@ public sealed class Position
 {
     private readonly List<DepartmentPosition> _departmentPositions = [];
 
-    public Position(PositionId id, Name name, Description description, bool isActive)
+    public Position(
+        PositionId id,
+        Name name,
+        Description description,
+        IEnumerable<DepartmentPosition> departmentPositions)
     {
         Id = id;
         Name = name;
         Description = description;
-        IsActive = isActive;
+        IsActive = true;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
+        _departmentPositions = departmentPositions.ToList();
     }
 
     // EF Core
