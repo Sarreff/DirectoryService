@@ -1,6 +1,8 @@
-﻿using DirectoryService.Application.Departments;
+﻿using DirectoryService.Application.Database;
+using DirectoryService.Application.Departments;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Positions;
+using DirectoryService.Infrastructure.Postgres.Database;
 using DirectoryService.Infrastructure.Postgres.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -23,7 +25,9 @@ public static class InfrastructureDependencyInjection
             options.UseNpgsql(connectionString, npgsqlOptions =>
             {
                 npgsqlOptions.SetPostgresVersion(14, 0);
-                npgsqlOptions.EnableRetryOnFailure(null);
+
+                // Конфликт из-за TransactionManager, пока убрал
+                // npgsqlOptions.EnableRetryOnFailure(null);
             });
 
             options.ConfigureWarnings(warnings =>
@@ -42,6 +46,7 @@ public static class InfrastructureDependencyInjection
         services.AddScoped<IDepartmentsRepository, DepartmentsEfCoreRepository>();
         services.AddScoped<ILocationsRepository, LocationsEfCoreRepository>();
         services.AddScoped<IPositionsRepository, PositionsEfCoreRepository>();
+        services.AddScoped<ITransactionManager, TransactionManager>();
 
         return services;
     }

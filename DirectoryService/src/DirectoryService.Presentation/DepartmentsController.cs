@@ -1,5 +1,7 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Departments.CreateDepartment;
+using DirectoryService.Application.Departments.UpdateDepartment;
+using DirectoryService.Contracts.Departments;
 using DirectoryService.Presentation.Results;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,5 +18,15 @@ public class DepartmentsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return await handler.Handle(command, cancellationToken);
+    }
+
+    [HttpPatch("{departmentId:guid}/locations")]
+    public async Task<EndpointResult<Guid>> UpdateDepartmentLocations(
+        [FromRoute] Guid departmentId,
+        [FromServices] ICommandHandler<Guid, UpdateDepartmentLocationsCommand> handler,
+        [FromBody] UpdateDepartmentLocationsRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await handler.Handle(new UpdateDepartmentLocationsCommand(departmentId, request), cancellationToken);
     }
 }

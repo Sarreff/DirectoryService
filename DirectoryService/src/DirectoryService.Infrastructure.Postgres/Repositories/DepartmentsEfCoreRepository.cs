@@ -95,8 +95,8 @@ public class DepartmentsEfCoreRepository : IDepartmentsRepository
         try
         {
             var id = new DepartmentId(departmentId);
-            Department? department = await _context.Departments.
-                Where(d => d.Id == id)
+            Department? department = await _context.Departments
+                .Where(d => d.Id == id && d.IsActive)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (department is not null)
@@ -104,8 +104,44 @@ public class DepartmentsEfCoreRepository : IDepartmentsRepository
                 return department;
             }
 
-            _logger.LogError("Department with id {Id} not found", departmentId);
-            return GeneralErrors.NotFound(departmentId);
+            _logger.LogError("Department with id {Id} not found or inactive", departmentId);
+            return DepartmentErrors.DepartmentsNotFoundOrInactive();
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(
+                ex,
+                "Operation was cancelled while getting department with id {Id}", departmentId);
+
+            return DepartmentErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Unexpected error while getting department with id {Id}", departmentId);
+
+            return DepartmentErrors.DatabaseError();
+        }
+    }
+
+    public async Task<Result<Department, Error>> GetByIdWithDepartmentLocationsAsync(
+        Guid departmentId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var id = new DepartmentId(departmentId);
+            Department? department = await _context.Departments
+                .Where(d => d.Id == id && d.IsActive)
+                .Include(d => d.DepartmentLocations)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (department is not null)
+                return department;
+
+            _logger.LogError("Department with id {Id} not found or inactive", departmentId);
+            return DepartmentErrors.DepartmentsNotFoundOrInactive();
         }
         catch (OperationCanceledException ex)
         {
@@ -128,6 +164,38 @@ public class DepartmentsEfCoreRepository : IDepartmentsRepository
     public Task<Result<Guid, Error>> DeleteAsync(Guid departmentId, CancellationToken cancellationToken)
         => throw new NotImplementedException();
 
+    public async Task<UnitResult<Error>> DeleteDepartmentLocationsByDepartmentId(
+        DepartmentId departmentId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _context.DepartmentLocations
+                .Where(ld => ld.DepartmentId == departmentId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            return UnitResult.Success<Error>();
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(
+                ex,
+                "Operation was cancelled while deleting DepartmentLocations by department with id {Id}",
+                departmentId);
+
+            return DepartmentErrors.OperationCancelled();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Unexpected error while deleting DepartmentLocations by department with id {Id}",
+                departmentId);
+
+            return DepartmentErrors.DatabaseError();
+        }
+    }
+
     public async Task<Result<bool, Error>> AllDepartmentsExistAndActiveAsync(
         IEnumerable<DepartmentId> departmentIds,
         CancellationToken cancellationToken)
@@ -137,8 +205,8 @@ public class DepartmentsEfCoreRepository : IDepartmentsRepository
             int existingCount = await _context.Departments
                 .CountAsync(
                     d =>
-                    departmentIds.Contains(d.Id) &&
-                    d.IsActive,
+                        departmentIds.Contains(d.Id) &&
+                        d.IsActive,
                     cancellationToken);
 
             if (existingCount == departmentIds.Count())
