@@ -2,6 +2,7 @@
 using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Departments.ValueObjects;
 using DirectoryService.Shared;
+using Path = DirectoryService.Domain.Departments.ValueObjects.Path;
 
 namespace DirectoryService.Application.Departments;
 
@@ -16,6 +17,18 @@ public interface IDepartmentsRepository
     Task<Result<Department, Error>> GetByIdWithDepartmentLocationsAsync(
         Guid departmentId,
         CancellationToken cancellationToken);
+
+    Task<Result<Department, Error>> GetByIdWithLockAsync(
+        DepartmentId departmentId,
+        CancellationToken cancellationToken);
+
+    Task MoveDepartmentSubtreeAsync(
+        Path oldPath,
+        Path newPath,
+        Guid? newParentId,
+        CancellationToken cancellationToken);
+
+    Task LockDescendantsAsync(string oldPath, CancellationToken cancellationToken);
 
     Task<Result<Guid, Error>> DeleteAsync(Guid departmentId, CancellationToken cancellationToken);
 
