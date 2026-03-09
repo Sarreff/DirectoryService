@@ -3,6 +3,7 @@ using DirectoryService.Domain.Departments.ValueObjects;
 using DirectoryService.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Path = DirectoryService.Domain.Departments.ValueObjects.Path;
 
 namespace DirectoryService.Infrastructure.Postgres.Configurations;
 
@@ -48,12 +49,17 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .IsRequired(false)
             .HasColumnName("parent_id");
 
-        builder.ComplexProperty(d => d.Path, pb =>
-        {
-            pb.Property(p => p.Value)
-                .IsRequired()
-                .HasColumnName("path");
-        });
+        builder.Property(d => d.Path)
+            .HasColumnName("path")
+            .HasColumnType("ltree")
+            .IsRequired()
+            .HasConversion(
+                p => p.Value,
+                v => Path.Create(v));
+
+        builder.HasIndex(d => d.Path)
+            .HasMethod("gist")
+            .HasDatabaseName("ix_departments_path");
 
         builder.Property(d => d.Depth)
             .IsRequired()

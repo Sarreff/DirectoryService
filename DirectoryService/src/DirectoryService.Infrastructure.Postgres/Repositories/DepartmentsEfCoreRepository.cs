@@ -7,6 +7,7 @@ using DirectoryService.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using Path = DirectoryService.Domain.Departments.ValueObjects.Path;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
 
@@ -159,6 +160,75 @@ public class DepartmentsEfCoreRepository : IDepartmentsRepository
 
             return DepartmentErrors.DatabaseError();
         }
+    }
+
+    public async Task<Result<Department, Error>> GetByIdWithLockAsync(
+        DepartmentId departmentId,
+        CancellationToken cancellationToken)
+    {
+        var department = await _context.Departments
+            .FromSqlInterpolated($"""
+                                  SELECT *
+                                  FROM departments
+                                  WHERE id = {departmentId.Value}
+                                    AND is_active = TRUE
+                                  FOR UPDATE
+                                  """)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (department is not null)
+        {
+            return department;
+        }
+
+        _logger.LogError("Department with id {Id} not found or inactive", departmentId);
+        return DepartmentErrors.DepartmentsNotFoundOrInactive();
+
+    }
+
+    public async Task MoveDepartmentSubtreeAsync(
+        Path oldPath,
+        Path newPath,
+        Guid? newParentId,
+        CancellationToken cancellationToken)
+    {
+        string oldPathStr = oldPath.Value;
+        string newPathStr = newPath.Value;
+
+        await _context.Database
+            .ExecuteSqlInterpolatedAsync(
+                $"""
+                 UPDATE departments
+                     SET
+                         parent_id = {newParentId},
+                         path = {newPathStr}::ltree,
+                         depth = nlevel({newPathStr}::ltree) - 1,
+                         updated_at = NOW()
+                     WHERE path = {oldPathStr}::ltree;
+                     
+                 UPDATE departments
+                     SET
+                         path = {newPathStr}::ltree || subpath(path, nlevel({oldPathStr}::ltree)),
+                         depth = nlevel({newPathStr}::ltree || subpath(path, nlevel({oldPathStr}::ltree))) - 1,
+                         updated_at = NOW()
+                     WHERE path <@ {oldPathStr}::ltree
+                       AND path != {oldPathStr}::ltree;
+                 """,
+                cancellationToken);
+    }
+
+    public async Task LockDescendantsAsync(string oldPath, CancellationToken cancellationToken)
+    {
+        await _context.Database.ExecuteSqlInterpolatedAsync(
+            $"""
+             SELECT *
+             FROM departments
+             WHERE path <@ {oldPath}::ltree 
+                AND path != {oldPath}::ltree
+             ORDER BY path
+             FOR UPDATE
+             """,
+            cancellationToken);
     }
 
     public Task<Result<Guid, Error>> DeleteAsync(Guid departmentId, CancellationToken cancellationToken)

@@ -14,6 +14,21 @@ public sealed record Path
         Value = value;
     }
 
+    public bool IsDescendantOf(Path ancestor)
+    {
+        return Value == ancestor.Value ||
+               Value.StartsWith(
+                   ancestor.Value + ".",
+                   StringComparison.Ordinal);
+    }
+
+    public static Path Create(string value)
+    {
+        return string.IsNullOrWhiteSpace(value) ?
+            throw new ArgumentException("Path cannot be empty")
+            : new Path(value);
+    }
+
     public static Path CreateParent(Identifier identifier)
     {
         return new Path(identifier.Value);

@@ -31,4 +31,19 @@ public static class DepartmentErrors
         Error.NotFound(new ErrorMessage(
             "departments.notfound.inactive",
             "Departments were not found or they are inactive"));
+
+    public static Error DepartmentReferenceError() =>
+        Error.Conflict(new ErrorMessage(
+            "department.reference.conflict",
+            "Department reference error while handling department"));
+
+    public static Error DepartmentSelfReferenceError() =>
+        Error.Conflict(new ErrorMessage(
+            "department.self_reference.conflict",
+            $"Department cannot refer to itself"));
+
+    public static Error DepartmentCycleError() =>
+        Error.Conflict(new ErrorMessage(
+            "department.cycle.error",
+            $"A cyclical dependency is created"));
 }
