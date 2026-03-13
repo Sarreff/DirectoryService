@@ -8,7 +8,7 @@ using Serilog.Exceptions;
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
-    .CreateBootstrapLogger();
+    .CreateLogger();
 
 try
 {
@@ -30,8 +30,8 @@ try
 
     builder.Services
         .AddConfiguration(builder.Configuration)
-        .AddInfrastructureConfiguration(builder.Configuration)
-        .AddApplicationConfiguration();
+        .AddApplicationConfiguration()
+        .AddInfrastructureConfiguration(builder.Configuration);
 
     var app = builder.Build();
 
@@ -42,6 +42,7 @@ try
 catch (Exception ex)
 {
     Log.Fatal(ex, "Application terminated unexpectedly");
+    throw;
 }
 finally
 {

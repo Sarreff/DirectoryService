@@ -1,6 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using DirectoryService.Infrastructure.Postgres;
-using DirectoryService.Infrastructure.Postgres.Configurations;
 using DirectoryService.Presentation.Envelopes;
 using DirectoryService.Shared;
 using Microsoft.OpenApi.Models;
@@ -17,8 +15,7 @@ public static class WebDependencyInjection
     {
         return services
             .AddSerilogLogging(configuration)
-            .AddOpenApiSpec()
-            .AddInfrastructureConfiguration(configuration);
+            .AddOpenApiSpec();
     }
 
     private static IServiceCollection AddOpenApiSpec(this IServiceCollection services)

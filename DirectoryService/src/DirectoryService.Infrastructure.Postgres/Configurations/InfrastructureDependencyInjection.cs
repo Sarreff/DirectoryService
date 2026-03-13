@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Infrastructure.Postgres.Configurations;
 
@@ -17,7 +18,7 @@ public static class InfrastructureDependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContextPool<DirectoryServiceDbContext>((sp, options) =>
+        services.AddDbContext<DirectoryServiceDbContext>((sp, options) =>
         {
             string connectionString = configuration.GetConnectionString(Constants.DATABASE)
                                       ?? throw new InvalidOperationException("Connection string not found");
