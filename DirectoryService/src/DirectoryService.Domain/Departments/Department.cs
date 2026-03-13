@@ -2,11 +2,8 @@
 using DirectoryService.Domain.DepartmentLocations;
 using DirectoryService.Domain.DepartmentLocations.ValueObjects;
 using DirectoryService.Domain.DepartmentPositions;
-using DirectoryService.Domain.DepartmentPositions.ValueObjects;
 using DirectoryService.Domain.Departments.ValueObjects;
-using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Locations.ValueObjects;
-using DirectoryService.Domain.Positions;
 using DirectoryService.Shared;
 using Name = DirectoryService.Domain.Departments.ValueObjects.Name;
 using Path = DirectoryService.Domain.Departments.ValueObjects.Path;
@@ -37,7 +34,7 @@ public sealed class Department
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
-        _departmentLocations = departmentLocations.ToList();
+        _departmentLocations.AddRange(departmentLocations);
     }
 
     // EF Core
@@ -130,7 +127,7 @@ public sealed class Department
             departmentId ?? new DepartmentId(Guid.NewGuid()),
             name,
             identifier,
-            parent.ParentId,
+            parent.Id,
             path,
             (short)(parent.Depth + 1),
             departmentLocationsList);
