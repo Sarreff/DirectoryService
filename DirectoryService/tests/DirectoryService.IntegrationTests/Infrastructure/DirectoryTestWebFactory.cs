@@ -29,14 +29,13 @@ public class DirectoryTestWebFactory : WebApplicationFactory<Program>, IAsyncLif
     {
         await _dbContainer.StartAsync();
 
+        _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
+
         await using var scope = Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<DirectoryServiceDbContext>();
 
         await dbContext.Database.EnsureDeletedAsync();
         await dbContext.Database.EnsureCreatedAsync();
-
-        _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
-        await _dbConnection.OpenAsync();
 
         await InitializeRespawner();
     }
@@ -62,13 +61,14 @@ public class DirectoryTestWebFactory : WebApplicationFactory<Program>, IAsyncLif
             services.RemoveAll<DirectoryServiceDbContext>();
             services.RemoveAll<DbContextOptions<DirectoryServiceDbContext>>();
 
-            services.AddDbContextPool<DirectoryServiceDbContext>(options =>
+            services.AddDbContext<DirectoryServiceDbContext>(options =>
                 options.UseNpgsql(_dbContainer.GetConnectionString()));
         });
     }
 
     private async Task InitializeRespawner()
     {
+        await _dbConnection.OpenAsync();
         _respawner = await Respawner.CreateAsync(
             _dbConnection,
             new RespawnerOptions { DbAdapter = DbAdapter.Postgres, SchemasToInclude = ["public"], });
