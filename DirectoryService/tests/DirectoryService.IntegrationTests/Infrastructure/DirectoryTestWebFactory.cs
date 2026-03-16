@@ -61,7 +61,7 @@ public class DirectoryTestWebFactory : WebApplicationFactory<Program>, IAsyncLif
             services.RemoveAll<DirectoryServiceDbContext>();
             services.RemoveAll<DbContextOptions<DirectoryServiceDbContext>>();
 
-            services.AddDbContext<DirectoryServiceDbContext>(options =>
+            services.AddDbContextPool<DirectoryServiceDbContext>(options =>
                 options.UseNpgsql(_dbContainer.GetConnectionString()));
         });
     }

@@ -5,6 +5,7 @@ using DirectoryService.Domain.Departments.ValueObjects;
 using DirectoryService.Domain.Locations.ValueObjects;
 using DirectoryService.IntegrationTests.Infrastructure;
 using DirectoryService.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.IntegrationTests.Departments.Create;
 
@@ -19,8 +20,7 @@ public class CreateDepartmentTests : DirectoryBaseTests
     public async Task CreateDepartment_with_valid_location_should_succeed()
     {
         // arrange
-        LocationId locationId = await Data.CreateValidLocation();
-        const int expectedLocationCount = 1;
+        LocationId locationId = await CreateValidLocation();
 
         var cancellationToken = CancellationToken.None;
 
@@ -39,16 +39,31 @@ public class CreateDepartmentTests : DirectoryBaseTests
         });
 
         // assert
-        await AssertDb.DepartmentCreated(result, expectedLocationCount, cancellationToken);
+        Assert.True(result.IsSuccess);
+        Assert.NotEqual(Guid.Empty, result.Value);
+
+        await ExecuteInDb(async dbContext =>
+        {
+            var department = await dbContext.Departments
+                .Include(d => d.DepartmentLocations)
+                .FirstAsync(d => d.Id == new DepartmentId(result.Value), cancellationToken);
+
+            Assert.Equal(result.Value, department.Id.Value);
+
+            Assert.Equal("Department", department.Name.Value);
+            Assert.Equal("department", department.Identifier.Value);
+
+            Assert.Single(department.DepartmentLocations);
+        });
     }
 
     [Fact]
     public async Task CreateDepartment_with_several_valid_locations_should_succeed()
     {
         // arrange
-        LocationId locationId1 = await Data.CreateValidLocation();
-        LocationId locationId2 = await Data.CreateValidLocation();
-        LocationId locationId3 = await Data.CreateValidLocation();
+        LocationId locationId1 = await CreateValidLocation();
+        LocationId locationId2 = await CreateValidLocation();
+        LocationId locationId3 = await CreateValidLocation();
         const int expectedLocationCount = 3;
 
         var cancellationToken = CancellationToken.None;
@@ -68,14 +83,29 @@ public class CreateDepartmentTests : DirectoryBaseTests
         });
 
         // assert
-        await AssertDb.DepartmentCreated(result, expectedLocationCount, cancellationToken);
+        Assert.True(result.IsSuccess);
+        Assert.NotEqual(Guid.Empty, result.Value);
+
+        await ExecuteInDb(async dbContext =>
+        {
+            var department = await dbContext.Departments
+                .Include(d => d.DepartmentLocations)
+                .FirstAsync(d => d.Id == new DepartmentId(result.Value), cancellationToken);
+
+            Assert.Equal(result.Value, department.Id.Value);
+
+            Assert.Equal("Department", department.Name.Value);
+            Assert.Equal("department", department.Identifier.Value);
+
+            Assert.Equal(expectedLocationCount, department.DepartmentLocations.Count);
+        });
     }
 
     [Fact]
     public async Task CreateDepartment_invalid_name_should_fail()
     {
         // arrange
-        LocationId locationId = await Data.CreateValidLocation();
+        LocationId locationId = await CreateValidLocation();
 
         var cancellationToken = CancellationToken.None;
 
@@ -94,14 +124,23 @@ public class CreateDepartmentTests : DirectoryBaseTests
         });
 
         // assert
-        await AssertDb.DepartmentDidNotCreated(result, ErrorType.VALIDATION, cancellationToken);
+        Assert.True(result.IsFailure);
+        Assert.NotEmpty(result.Error);
+
+        await ExecuteInDb(async dbContext =>
+        {
+            int departmentsCount = await dbContext.Departments.CountAsync(cancellationToken);
+
+            Assert.Equal(0, departmentsCount);
+            Assert.Contains(result.Error, e => e.Type == ErrorType.VALIDATION);
+        });
     }
 
     [Fact]
     public async Task CreateDepartment_with_inactive_location_should_fail()
     {
         // arrange
-        LocationId locationId = await Data.CreateInactiveLocation();
+        LocationId locationId = await CreateInactiveLocation();
 
         var cancellationToken = CancellationToken.None;
 
@@ -120,14 +159,23 @@ public class CreateDepartmentTests : DirectoryBaseTests
         });
 
         // assert
-        await AssertDb.DepartmentDidNotCreated(result, ErrorType.NOT_FOUND, cancellationToken);
+        Assert.True(result.IsFailure);
+        Assert.NotEmpty(result.Error);
+
+        await ExecuteInDb(async dbContext =>
+        {
+            int departmentsCount = await dbContext.Departments.CountAsync(cancellationToken);
+
+            Assert.Equal(0, departmentsCount);
+            Assert.Contains(result.Error, e => e.Type == ErrorType.NOT_FOUND);
+        });
     }
 
     [Fact]
     public async Task CreateDepartment_location_not_found_should_fail()
     {
         // arrange
-        LocationId locationId = Data.CreateNotExistLocation();
+        LocationId locationId = CreateNotExistLocation();
 
         var cancellationToken = CancellationToken.None;
 
@@ -146,7 +194,16 @@ public class CreateDepartmentTests : DirectoryBaseTests
         });
 
         // assert
-        await AssertDb.DepartmentDidNotCreated(result, ErrorType.NOT_FOUND, cancellationToken);
+        Assert.True(result.IsFailure);
+        Assert.NotEmpty(result.Error);
+
+        await ExecuteInDb(async dbContext =>
+        {
+            int departmentsCount = await dbContext.Departments.CountAsync(cancellationToken);
+
+            Assert.Equal(0, departmentsCount);
+            Assert.Contains(result.Error, e => e.Type == ErrorType.NOT_FOUND);
+        });
     }
 
     [Fact]
@@ -154,7 +211,7 @@ public class CreateDepartmentTests : DirectoryBaseTests
     {
         // arrange
         DepartmentId parentId = new(Guid.NewGuid());
-        LocationId locationId = await Data.CreateValidLocation();
+        LocationId locationId = await CreateValidLocation();
 
         var cancellationToken = CancellationToken.None;
 
@@ -173,6 +230,15 @@ public class CreateDepartmentTests : DirectoryBaseTests
         });
 
         // assert
-        await AssertDb.DepartmentDidNotCreated(result, ErrorType.NOT_FOUND, cancellationToken);
+        Assert.True(result.IsFailure);
+        Assert.NotEmpty(result.Error);
+
+        await ExecuteInDb(async dbContext =>
+        {
+            int departmentsCount = await dbContext.Departments.CountAsync(cancellationToken);
+
+            Assert.Equal(0, departmentsCount);
+            Assert.Contains(result.Error, e => e.Type == ErrorType.NOT_FOUND);
+        });
     }
 }

@@ -18,7 +18,7 @@ public static class InfrastructureDependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<DirectoryServiceDbContext>((sp, options) =>
+        services.AddDbContextPool<DirectoryServiceDbContext>((sp, options) =>
         {
             string connectionString = configuration.GetConnectionString(Constants.DATABASE)
                                       ?? throw new InvalidOperationException("Connection string not found");
