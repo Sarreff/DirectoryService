@@ -203,14 +203,14 @@ public class DepartmentsEfCoreRepository : IDepartmentsRepository
                          parent_id = {newParentId},
                          path = {newPathStr}::ltree,
                          depth = nlevel({newPathStr}::ltree) - 1,
-                         updated_at = NOW()
+                         updated_at = clock_timestamp()
                      WHERE path = {oldPathStr}::ltree;
                      
                  UPDATE departments
                      SET
                          path = {newPathStr}::ltree || subpath(path, nlevel({oldPathStr}::ltree)),
                          depth = nlevel({newPathStr}::ltree || subpath(path, nlevel({oldPathStr}::ltree))) - 1,
-                         updated_at = NOW()
+                         updated_at = clock_timestamp()
                      WHERE path <@ {oldPathStr}::ltree
                        AND path != {oldPathStr}::ltree;
                  """,
