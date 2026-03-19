@@ -18,6 +18,12 @@ public static class ApplicationDependencyInjection
             .AsSelfWithInterfaces()
             .WithScopedLifetime());
 
+        services.Scan(scan => scan.FromAssemblies(assembly)
+            .AddClasses(classes => classes
+                .AssignableToAny(typeof(IQueryHandler<,>)))
+            .AsSelfWithInterfaces()
+            .WithScopedLifetime());
+
         return services;
     }
 }

@@ -40,9 +40,14 @@ public static class InfrastructureDependencyInjection
                 return;
             }
 
+            options.LogTo(Console.WriteLine, LogLevel.Information);
+
             options.EnableSensitiveDataLogging();
             options.EnableDetailedErrors();
         });
+
+        services.AddScoped<IReadDbContext>(sp =>
+            sp.GetRequiredService<DirectoryServiceDbContext>());
 
         services.AddScoped<IDepartmentsRepository, DepartmentsEfCoreRepository>();
         services.AddScoped<ILocationsRepository, LocationsEfCoreRepository>();

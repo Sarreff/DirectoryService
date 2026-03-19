@@ -1,8 +1,8 @@
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Locations.CreateLocation;
-using DirectoryService.Domain.Exceptions;
+using DirectoryService.Application.Locations.GetLocation;
+using DirectoryService.Contracts.Locations;
 using DirectoryService.Presentation.Results;
-using DirectoryService.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.Presentation;
@@ -20,10 +20,12 @@ public class LocationsController : ControllerBase
         return await handler.Handle(command, cancellationToken);
     }
 
-    // Для проверки ExceptionMiddleware
     [HttpGet]
-    public async Task<EndpointResult<string>> Test()
+    public async Task<EndpointResult<GetLocationsDto>> GetWithFilter(
+        [FromQuery] GetLocationsRequest request,
+        [FromServices] GetLocationsHandler handler,
+        CancellationToken cancellationToken)
     {
-        throw new NotFoundException(GeneralErrors.Failure("Тестовая ошибка"));
+        return await handler.Handle(new GetLocationsQuery(request), cancellationToken);
     }
 }

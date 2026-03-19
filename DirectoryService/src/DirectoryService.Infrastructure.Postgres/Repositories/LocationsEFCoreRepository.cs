@@ -90,8 +90,12 @@ public class LocationsEfCoreRepository : ILocationsRepository
     public Task<Result<Guid, Error>> UpdateAsync(Location location, CancellationToken cancellationToken)
         => throw new NotImplementedException();
 
-    public Task<Result<Location, Error>> GetByIdAsync(Guid locationId, CancellationToken cancellationToken)
-        => throw new NotImplementedException();
+    public async Task<Location?> GetByIdAsync(LocationId locationId, CancellationToken cancellationToken)
+    {
+        return await _context.Locations
+            .AsNoTracking()
+            .FirstOrDefaultAsync(l => l.Id == locationId, cancellationToken);
+    }
 
     public Task<Result<Guid, Error>> DeleteAsync(Guid locationId, CancellationToken cancellationToken)
         => throw new NotImplementedException();

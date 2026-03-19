@@ -25,13 +25,18 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .ValueGeneratedNever()
             .HasColumnName("id");
 
-        builder.Property(l => l.Name)
-            .HasConversion(
-                n => n.Value,
-                v => new Name(v))
-            .IsRequired()
-            .HasMaxLength(LengthConstants.LENGTH120)
-            .HasColumnName("name");
+        builder.OwnsOne(
+            l => l.Name, lb =>
+            {
+                lb.Property(l => l.Value)
+                    .HasMaxLength(LengthConstants.LENGTH120)
+                    .IsRequired()
+                    .HasColumnName("name");
+
+                lb.HasIndex(l => l.Value)
+                    .IsUnique()
+                    .HasDatabaseName(Index.NAME);
+            });
 
         builder.OwnsOne(l => l.Address, ab =>
         {
@@ -75,12 +80,6 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
         builder.Navigation(l => l.DepartmentLocations)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.HasIndex(l => l.Name)
-            .IsUnique()
-            .HasDatabaseName(Index.NAME)
-            .HasDatabaseName(Index.NAME) // Это НЕ имя constraint, а имя индекса
-            .HasFilter(null);
 
         builder.HasIndex(l => l.FullPath)
             .IsUnique()
