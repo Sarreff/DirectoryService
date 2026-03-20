@@ -45,18 +45,18 @@ public class GetLocationsHandler : IQueryHandler<GetLocationsDto, GetLocationsQu
 
         IQueryable<Location> locationsQuery = _readDbContext.LocationRead;
         IQueryable<DepartmentLocation> departmentLocationQuery = _readDbContext.DepartmentLocationRead;
-        List<DepartmentId>? departmentIds;
 
         if (request.DepartmentIds is not null && request.DepartmentIds.Count != 0)
         {
-            departmentIds = request.DepartmentIds.Select(id => new DepartmentId(id)).ToList();
+            var departmentIds = request.DepartmentIds
+                .Select(id => new DepartmentId(id))
+                .ToList();
 
-            var locationIds = departmentLocationQuery
-                .Where(dl => departmentIds.Contains(dl.DepartmentId))
-                .Select(dl => dl.LocationId)
-                .Distinct();
-
-            locationsQuery = locationsQuery.Where(l => locationIds.Contains(l.Id));
+            locationsQuery = locationsQuery.Where(l =>
+                departmentLocationQuery
+                    .Any(dl =>
+                        dl.LocationId == l.Id &&
+                        departmentIds.Contains(dl.DepartmentId)));
         }
 
         if (!string.IsNullOrWhiteSpace(request.SearchName))
