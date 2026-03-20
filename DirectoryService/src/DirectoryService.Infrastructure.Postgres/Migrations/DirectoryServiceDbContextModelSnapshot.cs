@@ -18,7 +18,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.11")
+                .HasAnnotation("ProductVersion", "9.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "ltree");
@@ -290,7 +290,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
                             b1.HasKey("LocationId");
 
-                            b1.ToTable("locations");
+                            b1.ToTable("locations", (string)null);
 
                             b1.ToJson("address");
 
@@ -316,7 +316,7 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
 
                             b1.HasKey("PositionId");
 
-                            b1.ToTable("positions");
+                            b1.ToTable("positions", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("PositionId");
