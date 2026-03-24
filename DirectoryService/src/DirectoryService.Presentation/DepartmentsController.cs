@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Departments.CreateDepartment;
+using DirectoryService.Application.Departments.GetDepartment;
 using DirectoryService.Application.Departments.MoveDepartment;
 using DirectoryService.Application.Departments.UpdateDepartment;
 using DirectoryService.Contracts.Departments;
@@ -39,5 +40,13 @@ public class DepartmentsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return await handler.Handle(new MoveDepartmentCommand(departmentId, request), cancellationToken);
+    }
+
+    [HttpGet("top-positions")]
+    public async Task<EndpointResult<GetTopDepartmentsByPositionCountDto>> GetTopPositions(
+        [FromServices] IQueryHandler<GetTopDepartmentsByPositionCountDto, GetTopPositionsQuery> handler,
+        CancellationToken cancellationToken)
+    {
+        return await handler.Handle(new GetTopPositionsQuery(), cancellationToken);
     }
 }

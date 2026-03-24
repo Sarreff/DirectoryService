@@ -1,6 +1,6 @@
 ﻿namespace DirectoryService.Contracts.Departments;
 
-public record DepartmentDto
+public record DepartmentWithPositionCountDto
 {
     public Guid Id { get; init; }
 
@@ -11,4 +11,6 @@ public record DepartmentDto
     public Guid? ParentId { get; init; }
 
     public bool IsActive { get; init; }
+
+    public int PositionCount { get; init; }
 }
