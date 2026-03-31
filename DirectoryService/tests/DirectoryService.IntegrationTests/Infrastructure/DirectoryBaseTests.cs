@@ -154,7 +154,8 @@ public class DirectoryBaseTests : IClassFixture<DirectoryTestWebFactory>, IAsync
         string name,
         string identifier,
         Department parentDepartment,
-        IEnumerable<LocationId> locationIds)
+        IEnumerable<LocationId> locationIds,
+        bool isActive = true)
     {
         List<LocationId> locationIdsList = locationIds.ToList();
 
@@ -181,6 +182,9 @@ public class DirectoryBaseTests : IClassFixture<DirectoryTestWebFactory>, IAsync
                 parentDepartment,
                 departmentLocations,
                 departmentId);
+
+            if (!isActive)
+                department.Value.Deactivate();
 
             dbContext.Departments.Add(department.Value);
 

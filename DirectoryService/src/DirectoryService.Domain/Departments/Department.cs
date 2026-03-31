@@ -76,6 +76,11 @@ public sealed class Department
         return UnitResult.Success<Error>();
     }
 
+    public void Deactivate()
+    {
+        IsActive = false;
+    }
+
     public static Result<Department, Error> CreateParent(
         Name name,
         Identifier identifier,

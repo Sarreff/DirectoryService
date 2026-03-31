@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using DirectoryService.Application.Database;
 using DirectoryService.Infrastructure.Postgres;
 using DirectoryService.Web;
 using Microsoft.AspNetCore.Hosting;
@@ -63,6 +64,10 @@ public class DirectoryTestWebFactory : WebApplicationFactory<Program>, IAsyncLif
 
             services.AddDbContextPool<DirectoryServiceDbContext>(options =>
                 options.UseNpgsql(_dbContainer.GetConnectionString()));
+
+            services.RemoveAll<IDbConnectionFactory>();
+            services.AddSingleton<IDbConnectionFactory>(
+                new TestDbConnectionFactory(_dbContainer.GetConnectionString()));
         });
     }
 

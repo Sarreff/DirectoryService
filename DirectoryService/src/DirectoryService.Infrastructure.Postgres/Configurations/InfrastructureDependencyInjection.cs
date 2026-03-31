@@ -20,6 +20,8 @@ public static class InfrastructureDependencyInjection
     {
         services.AddDbContextPool<DirectoryServiceDbContext>((sp, options) =>
         {
+            var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+
             string connectionString = configuration.GetConnectionString(Constants.DATABASE)
                                       ?? throw new InvalidOperationException("Connection string not found");
 
@@ -40,15 +42,15 @@ public static class InfrastructureDependencyInjection
                 return;
             }
 
-            options.LogTo(Console.WriteLine, LogLevel.Information);
-
+            options.UseLoggerFactory(loggerFactory);
             options.EnableSensitiveDataLogging();
             options.EnableDetailedErrors();
         });
 
-        services.AddScoped<IReadDbContext>(sp =>
-            sp.GetRequiredService<DirectoryServiceDbContext>());
+        services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
+        services.AddScoped<IReadDbContext>(sp => sp.GetRequiredService<DirectoryServiceDbContext>());
         services.AddScoped<IDepartmentsRepository, DepartmentsEfCoreRepository>();
         services.AddScoped<ILocationsRepository, LocationsEfCoreRepository>();
         services.AddScoped<IPositionsRepository, PositionsEfCoreRepository>();
