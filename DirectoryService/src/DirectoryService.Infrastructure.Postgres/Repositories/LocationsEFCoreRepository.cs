@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Locations;
+using DirectoryService.Domain.Departments.ValueObjects;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Locations.ValueObjects;
 using DirectoryService.Shared;
@@ -99,6 +100,48 @@ public class LocationsEfCoreRepository : ILocationsRepository
 
     public Task<Result<Guid, Error>> DeleteAsync(Guid locationId, CancellationToken cancellationToken)
         => throw new NotImplementedException();
+
+    public async Task<UnitResult<Error>> DeactivateLocationsAsync(
+        DepartmentId departmentId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var utcNow = DateTime.UtcNow;
+
+            await _context.Locations
+                .Where(l => _context.DepartmentLocations
+                    .Any(dl => dl.LocationId == l.Id &&
+                               dl.DepartmentId == departmentId))
+                .Where(l => !_context.DepartmentLocations
+                    .Where(dl => dl.LocationId == l.Id &&
+                                 dl.DepartmentId != departmentId)
+                    .Join(
+                        _context.Departments,
+                        dl => dl.DepartmentId,
+                        d => d.Id,
+                        (dl, d) => d)
+                    .Any(d => d.IsActive))
+                .ExecuteUpdateAsync(
+                    setters => setters
+                        .SetProperty(l => l.IsActive, false)
+                        .SetProperty(l => l.DeletedAt, utcNow),
+                    cancellationToken);
+
+            return UnitResult.Success<Error>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Failed to deactivate orphan locations for department {DepartmentId}",
+                departmentId.Value);
+
+            return Error.Failure(
+                "location.deactivate.failed",
+                "Failed to deactivate orphan locations");
+        }
+    }
 
     public async Task<Result<bool, Error>> AllLocationsExistAndActiveAsync(
         IEnumerable<LocationId> locationIds,

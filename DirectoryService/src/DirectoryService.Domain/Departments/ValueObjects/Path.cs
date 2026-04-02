@@ -1,7 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using DirectoryService.Shared;
-
-namespace DirectoryService.Domain.Departments.ValueObjects;
+﻿namespace DirectoryService.Domain.Departments.ValueObjects;
 
 public sealed record Path
 {
@@ -37,5 +34,16 @@ public sealed record Path
     public Path CreateChild(Identifier childIdentifier)
     {
         return new Path(Value + SEPARATOR + childIdentifier.Value);
+    }
+
+    public Path AddDeletedPrefix()
+    {
+        string[] pathParts = Value.Split(SEPARATOR);
+        if (!pathParts[^1].StartsWith("deleted-"))
+        {
+            pathParts[^1] = "deleted-" + pathParts[^1];
+        }
+
+        return new Path(string.Join(SEPARATOR, pathParts));
     }
 }

@@ -20,7 +20,8 @@ public interface IDepartmentsRepository
 
     Task<Result<Department, Error>> GetByIdWithLockAsync(
         DepartmentId departmentId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken,
+        bool isActive = true);
 
     Task MoveDepartmentSubtreeAsync(
         Path oldPath,
@@ -39,4 +40,6 @@ public interface IDepartmentsRepository
     Task<Result<bool, Error>> AllDepartmentsExistAndActiveAsync(
         IEnumerable<DepartmentId> departmentIds,
         CancellationToken cancellationToken);
+
+    Task SoftDeleteDepartmentSubtreeAsync(Path oldPath, CancellationToken cancellationToken);
 }

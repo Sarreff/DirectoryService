@@ -1,5 +1,4 @@
 ﻿using DirectoryService.Domain.DepartmentLocations;
-using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Locations.ValueObjects;
 
 namespace DirectoryService.Domain.Locations;
@@ -45,5 +44,13 @@ public sealed class Location
 
     public DateTime UpdatedAt { get; private set; }
 
+    public DateTime? DeletedAt { get; private set; }
+
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
+
+    public void Deactivate()
+    {
+        IsActive = false;
+        DeletedAt = DateTime.UtcNow;
+    }
 }

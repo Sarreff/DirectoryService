@@ -1,10 +1,11 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Positions;
+using DirectoryService.Domain.Departments.ValueObjects;
 using DirectoryService.Domain.Positions;
-using DirectoryService.Domain.Positions.ValueObjects;
 using DirectoryService.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Name = DirectoryService.Domain.Positions.ValueObjects.Name;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
 
@@ -55,6 +56,48 @@ public class PositionsEfCoreRepository : IPositionsRepository
 
     public Task<Result<Guid, Error>> DeleteAsync(Guid positionId, CancellationToken cancellationToken)
         => throw new NotImplementedException();
+
+    public async Task<UnitResult<Error>> DeactivatePositionsAsync(
+        DepartmentId departmentId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var utcNow = DateTime.UtcNow;
+
+            await _context.Positions
+                .Where(p => _context.DepartmentPositions
+                    .Any(dp => dp.PositionId == p.Id &&
+                               dp.DepartmentId == departmentId))
+                .Where(p => !_context.DepartmentPositions
+                    .Where(dp => dp.PositionId == p.Id &&
+                                 dp.DepartmentId != departmentId)
+                    .Join(
+                        _context.Departments,
+                        dp => dp.DepartmentId,
+                        d => d.Id,
+                        (dp, d) => d)
+                    .Any(d => d.IsActive))
+                .ExecuteUpdateAsync(
+                    setters => setters
+                        .SetProperty(p => p.IsActive, false)
+                        .SetProperty(p => p.DeletedAt, utcNow),
+                    cancellationToken);
+
+            return UnitResult.Success<Error>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Failed to deactivate orphan positions for department {DepartmentId}",
+                departmentId.Value);
+
+            return Error.Failure(
+                "position.deactivate.failed",
+                "Failed to deactivate orphan positions");
+        }
+    }
 
     public async Task<Result<bool, Error>> IsNameUniqueAndActiveAsync(Name name, CancellationToken cancellationToken)
     {
