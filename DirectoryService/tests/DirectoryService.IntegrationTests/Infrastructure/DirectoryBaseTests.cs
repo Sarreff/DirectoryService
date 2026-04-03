@@ -4,11 +4,14 @@ using DirectoryService.Domain.Departments;
 using DirectoryService.Domain.Departments.ValueObjects;
 using DirectoryService.Domain.Locations;
 using DirectoryService.Domain.Locations.ValueObjects;
+using DirectoryService.Domain.Positions;
+using DirectoryService.Domain.Positions.ValueObjects;
 using DirectoryService.Infrastructure.Postgres;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using DepartmentName = DirectoryService.Domain.Departments.ValueObjects.Name;
 using LocationName = DirectoryService.Domain.Locations.ValueObjects.Name;
+using PositionName = DirectoryService.Domain.Positions.ValueObjects.Name;
 
 namespace DirectoryService.IntegrationTests.Infrastructure;
 
@@ -112,10 +115,29 @@ public class DirectoryBaseTests : IClassFixture<DirectoryTestWebFactory>, IAsync
         return new LocationId(Guid.NewGuid());
     }
 
+    protected async Task<PositionId> CreateValidPosition(IEnumerable<DepartmentId> departmentIds)
+    {
+        string randomSuffix = Guid.NewGuid().ToString()[..8];
+
+        return await ExecuteInDb(async dbContext =>
+        {
+            var name = PositionName.Create($"Position {randomSuffix}").Value;
+            var description = Description.Create($"Description for {name}").Value;
+
+            var position = Position.Create(name, description, departmentIds);
+
+            dbContext.Positions.Add(position.Value);
+            await dbContext.SaveChangesAsync();
+
+            return position.Value.Id;
+        });
+    }
+
     protected async Task<Department> CreateValidParentDepartment(
         string name,
         string identifier,
-        IEnumerable<LocationId> locationIds)
+        IEnumerable<LocationId> locationIds,
+        bool isActive = true)
     {
         List<LocationId> locationIdsList = locationIds.ToList();
 
@@ -141,6 +163,9 @@ public class DirectoryBaseTests : IClassFixture<DirectoryTestWebFactory>, IAsync
                 identifierResult.Value,
                 departmentLocations,
                 departmentId);
+
+            if (!isActive)
+                department.Value.Deactivate();
 
             dbContext.Departments.Add(department.Value);
 

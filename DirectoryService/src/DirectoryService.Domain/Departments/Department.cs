@@ -58,6 +58,8 @@ public sealed class Department
 
     public DateTime UpdatedAt { get; private set; }
 
+    public DateTime? DeletedAt { get; private set; }
+
     public IReadOnlyList<Department> ChildrenDepartments => _childrenDepartments;
 
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
@@ -79,6 +81,7 @@ public sealed class Department
     public void Deactivate()
     {
         IsActive = false;
+        DeletedAt = DateTime.UtcNow;
     }
 
     public static Result<Department, Error> CreateParent(

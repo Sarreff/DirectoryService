@@ -164,14 +164,15 @@ public class DepartmentsEfCoreRepository : IDepartmentsRepository
 
     public async Task<Result<Department, Error>> GetByIdWithLockAsync(
         DepartmentId departmentId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool isActive = true)
     {
         var department = await _context.Departments
             .FromSqlInterpolated($"""
                                   SELECT *
                                   FROM departments
                                   WHERE id = {departmentId.Value}
-                                    AND is_active = TRUE
+                                    AND is_active = {isActive}
                                   FOR UPDATE
                                   """)
             .FirstOrDefaultAsync(cancellationToken);
@@ -215,6 +216,29 @@ public class DepartmentsEfCoreRepository : IDepartmentsRepository
                        AND path != {oldPathStr}::ltree;
                  """,
                 cancellationToken);
+    }
+
+    public async Task SoftDeleteDepartmentSubtreeAsync(
+        Path oldPath,
+        CancellationToken cancellationToken)
+    {
+        string oldPathStr = oldPath.Value;
+        string deletedPathStr = oldPath.AddDeletedPrefix().Value;
+
+        await _context.Database.ExecuteSqlInterpolatedAsync(
+            $"""
+             UPDATE departments
+                SET path = {deletedPathStr}::ltree,
+                    updated_at = clock_timestamp()
+              WHERE path = {oldPathStr}::ltree;
+
+             UPDATE departments
+                SET path = {deletedPathStr}::ltree || subpath(path, nlevel({oldPathStr}::ltree)),
+                    updated_at = clock_timestamp()
+              WHERE path <@ {oldPathStr}::ltree
+                AND path != {oldPathStr}::ltree;
+             """,
+            cancellationToken);
     }
 
     public async Task LockDescendantsAsync(string oldPath, CancellationToken cancellationToken)
